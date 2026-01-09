@@ -1,0 +1,209 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f8f8;
+}
+
+.header {
+  padding: 30rpx;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.search-box {
+  flex: 1;
+  height: 72rpx;
+  background-color: #f2f2f2;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  margin-left: 10rpx;
+}
+
+.new-btn {
+  font-size: 28rpx;
+  color: #007aff;
+  font-weight: bold;
+}
+
+.project-list {
+  flex: 1;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.project-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.02);
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.project-card.selected {
+  background-color: #f0f7ff;
+  border: 2rpx solid #007aff;
+}
+
+.project-info {
+  flex: 1;
+}
+
+.project-title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.type-tag {
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 6rpx;
+  margin-right: 12rpx;
+  color: #fff;
+}
+
+.type-tag.toastmasters_story { background-color: #8b1d42; } /* 头马色 */
+.type-tag.workplace { background-color: #007aff; }
+
+.project-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-indicator {
+  font-size: 20rpx;
+  color: #007aff;
+  background-color: rgba(0, 122, 255, 0.1);
+  padding: 2rpx 10rpx;
+  border-radius: 20rpx;
+  margin-left: 10rpx;
+}
+
+.project-meta {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.progress-bar-container {
+  height: 6rpx;
+  background-color: #eee;
+  border-radius: 3rpx;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #007aff;
+  border-radius: 3rpx;
+}
+
+.project-actions {
+  display: flex;
+  margin-left: 20rpx;
+  gap: 20rpx;
+}
+
+.action-item {
+  font-size: 24rpx;
+  color: #666;
+  padding: 10rpx 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 30rpx;
+}
+
+.action-item.primary {
+  color: #007aff;
+  background-color: rgba(0, 122, 255, 0.05);
+}
+
+.action-item.danger {
+  color: #ff3b30;
+  background-color: rgba(255, 59, 48, 0.05);
+}
+
+.select-icon {
+  margin-left: 20rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 200rpx;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.list-footer {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 22rpx;
+  color: #ccc;
+}
+
+.batch-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 20rpx 40rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.05);
+  z-index: 100;
+}
+
+.batch-info {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.batch-btns {
+  display: flex;
+  gap: 20rpx;
+}
+
+.batch-btn {
+  padding: 16rpx 40rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.batch-btn.cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.batch-btn.delete {
+  background-color: #ff3b30;
+  color: #fff;
+}
+

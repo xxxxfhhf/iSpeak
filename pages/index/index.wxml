@@ -1,0 +1,157 @@
+<view class="container">
+  <!-- 顶部项目信息 -->
+  <view class="header">
+    <view class="header-top">
+      <view class="back-home" bindtap="onGoHome">🏠</view>
+      <view class="structure-progress">
+        <view class="progress-label">结构进度:</view>
+        <view class="progress-dots">
+          <block wx:for="{{cards}}" wx:key="id">
+            <view class="progress-dot {{item.content ? 'filled' : ''}}" title="{{item.typeLabel}}"></view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <input class="title-input" value="{{project.title}}" bindinput="onTitleChange" placeholder="输入演讲标题" />
+    <view class="duration-info">
+      预估时长: <text class="duration-text">{{totalDurationStr}}</text>
+    </view>
+  </view>
+
+  <!-- 画布区 -->
+  <scroll-view 
+    scroll-y 
+    class="canvas" 
+    scroll-with-animation="{{!isDragging}}" 
+    scroll-enabled="{{!scrollLock}}"
+    bindscroll="onScroll"
+  >
+    <view class="card-list">
+      <!-- 逻辑导轨线 -->
+      <view class="logic-rail"></view>
+
+      <block wx:for="{{cards}}" wx:key="id">
+        <!-- 拖拽占位符 (Before) -->
+        <view class="placeholder-box" wx:if="{{draggingId && dragTargetIndex === index}}">
+          <view class="placeholder-inner"></view>
+        </view>
+
+        <view 
+          class="card-wrapper {{draggingId === item.id ? 'dragging' : ''}} {{activeCardId === item.id ? 'active' : ''}} {{item.isAi ? 'is-ai' : ''}}"
+          style="{{draggingId === item.id ? 'top: ' + dragTop + 'px; width: ' + cardWidth + 'px;' : ''}}"
+          bindtouchstart="onCardTouchStart"
+          bindtouchmove="onCardTouchMove"
+          bindtouchend="onCardTouchEnd"
+          data-id="{{item.id}}"
+          data-index="{{index}}"
+        >
+          <view class="card-container" catchtap="onCardTap" data-id="{{item.id}}">
+            <view class="card-rail-node">
+              <block wx:if="{{activeCardId === item.id}}">
+                <view class="move-btn" catchtap="onMoveUp" data-index="{{index}}">↑</view>
+                <view class="move-btn" catchtap="onMoveDown" data-index="{{index}}">↓</view>
+              </block>
+            </view>
+            
+            <view class="card-content-box">
+              <view class="card-header">
+                <view class="card-meta">
+                  <picker bindchange="onTypeChange" data-id="{{item.id}}" value="{{typeIndexMap[item.type]}}" range="{{cardTypes}}" range-key="label">
+                    <view class="card-type">[{{item.typeLabel}}]</view>
+                  </picker>
+                  <view class="card-intent" wx:if="{{activeCardId === item.id}}">{{item.intent}}</view>
+                  <view class="ai-badge" wx:if="{{item.isAi}}">✨ AI 生成</view>
+                </view>
+                
+                <view class="card-actions" wx:if="{{activeCardId === item.id}}">
+                  <view class="action-btn" wx:if="{{item.isAi}}" catchtap="onConfirmAi" data-id="{{item.id}}">✔️确认</view>
+                  <view class="action-btn" catchtap="onDeleteCard" data-id="{{item.id}}">🗑️</view>
+                  <view class="action-btn" catchtap="onAiAction" data-id="{{item.id}}">✨AI</view>
+                  <view class="action-btn" catchtap="onAddAfter" data-id="{{item.id}}">➕追加</view>
+                </view>
+                <view class="card-duration-tag" wx:else>{{item.durationSec}}s</view>
+              </view>
+              
+              <view class="card-body">
+                <textarea 
+                  class="card-textarea" 
+                  value="{{item.content}}" 
+                  placeholder="{{item.placeholder}}" 
+                  auto-height 
+                  bindinput="onContentChange" 
+                  data-id="{{item.id}}"
+                  maxlength="-1"
+                />
+                
+                <view class="quotes-list" wx:if="{{item.quotes.length > 0}}">
+                  <view class="quote-item" wx:for="{{item.quotes}}" wx:for-item="quote" wx:key="index">
+                    <text class="quote-lock">{{quote.pinned ? '🔒' : '🔓'}}</text>
+                    <text class="quote-text">{{quote.text}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 拖拽占位符 (末尾情况) -->
+      <view class="placeholder-box" wx:if="{{draggingId && dragTargetIndex >= cards.length}}">
+        <view class="placeholder-inner"></view>
+      </view>
+      
+      <!-- 隐形插入入口 -->
+      <view class="add-btn-minimal" bindtap="onAddNewCard">
+        <text>+ 点击插入新积木 ...</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- AI 协作看板 -->
+  <view class="ai-hub" wx:if="{{suggestions.length > 0}}">
+    <view class="ai-hub-header" bindtap="toggleAiHub">
+      <view class="ai-hub-title-box">
+        <text class="ai-hub-title">🤖 AI 协作看板</text>
+        <text class="ai-hub-count">{{suggestions.length}}</text>
+      </view>
+      <view class="ai-hub-toggle">{{showAiHub ? '收起' : '展开建议'}}</view>
+    </view>
+    <scroll-view scroll-y class="suggestion-list" wx:if="{{showAiHub}}">
+      <view class="suggestion-card" wx:for="{{suggestions}}" wx:key="id">
+        <text class="suggestion-text">{{item.text}}</text>
+        <view class="suggestion-actions">
+          <view class="suggestion-btn ignore" bindtap="onIgnoreSuggestion" data-id="{{item.id}}">忽略</view>
+          <view class="suggestion-btn" bindtap="onProcessSuggestion" data-id="{{item.id}}">{{item.btnText || '去处理'}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 底部固定操作 -->
+  <view class="footer">
+    <view class="footer-btn" bindtap="onAddNewCard">
+      <view class="footer-icon">➕</view>
+      <text>加积木</text>
+    </view>
+    <view class="footer-btn" bindtap="onAiComplete">
+      <view class="footer-icon">🤖</view>
+      <text>AI补齐</text>
+    </view>
+    <view class="footer-btn" bindtap="onGoToPreview">
+      <view class="footer-icon">👁️</view>
+      <text>预览导出</text>
+    </view>
+  </view>
+
+  <!-- AI 菜单 -->
+  <view class="ai-menu-mask" wx:if="{{showAiMenu}}" bindtap="hideAiMenu">
+    <view class="ai-menu" catchtap="true">
+      <view class="ai-menu-title">✨ AI 改写/填充</view>
+      <view class="ai-menu-item" bindtap="doAiAction" data-action="fill">填充内容 (基于骨架生成详情)</view>
+      <view class="ai-menu-item" bindtap="doAiAction" data-action="oral">口语化</view>
+      <view class="ai-menu-item" bindtap="doAiAction" data-action="vivid">更有画面感</view>
+      <view class="ai-menu-item" bindtap="doAiAction" data-action="brief">精简</view>
+      <view class="ai-menu-item" bindtap="doAiAction" data-action="quote">生成金句</view>
+    </view>
+  </view>
+</view>

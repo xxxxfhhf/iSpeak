@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="onBack"> &lt; 返回编辑 </view>
+    <view class="copy-btn" bindtap="onCopy"> 📋 一键复制 Markdown </view>
+  </view>
+
+  <scroll-view scroll-y class="preview-area">
+    <view class="markdown-content">
+      <view class="md-h1"># {{project.title}}</view>
+      <view class="md-info">预估总时长：{{totalDurationStr}} (约 {{totalWordCount}} 字)</view>
+
+      <block wx:for="{{cards}}" wx:key="id">
+        <view class="md-section">
+          <view class="md-h2">## {{index + 1}}. {{item.title}}</view>
+          <view class="md-p">{{item.content || '(暂无内容)'}}</view>
+          <view class="md-quotes" wx:if="{{item.quotes.length > 0}}">
+            <view class="md-quote" wx:for="{{item.quotes}}" wx:for-item="quote" wx:key="index">
+              **> {{quote.text}}**
+            </view>
+          </view>
+          <view class="md-duration-hint {{item.durationStatus}}">
+            预估用时: {{item.durationSec}}s | 字数: {{item.wordCount}} 
+            <text wx:if="{{item.durationStatus === 'too-short'}}">(建议扩写)</text>
+            <text wx:if="{{item.durationStatus === 'too-long'}}">(内容较多，建议精简)</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <view class="analysis-footer">
+    <view class="analysis-title">时长分析 (语速: 200字/min)</view>
+    <view class="chart">
+      <view 
+        class="chart-bar" 
+        wx:for="{{cards}}" 
+        wx:key="id" 
+        style="height: {{item.barHeight}}%; background-color: {{item.barColor}};"
+        title="{{item.title}}"
+      ></view>
+    </view>
+    <button class="export-btn" bindtap="onCopy">复制全文到剪贴板</button>
+  </view>
+</view>
+
