@@ -10,5 +10,7 @@
     "navigationBarTitleText": "AI 演讲积木",
     "navigationBarTextStyle": "black"
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "cloud": true,
+  "requiredBackgroundModes": []
 }

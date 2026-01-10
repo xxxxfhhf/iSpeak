@@ -1,6 +1,3 @@
-const API_KEY = 'sk-7b7a728f3a8249a5a5b1d857c1ee8217'; // 用户需在此处填入 API Key
-const BASE_URL = 'https://api.deepseek.com/v1/chat/completions';
-
 const SYSTEM_PROMPTS = {
   fill: '你是一位资深的演讲教练。请根据用户提供的演讲段落标题和简要大纲，将其填充为一段完整、流畅、具有吸引力的演讲稿。要求：口语化、直接、有力，适合在职场或头马（Toastmasters）场合演讲。',
   oral: '请将以下演讲段落修改得更加口语化。去掉书面语，使用短句，增加语气助词，使其听起来像是在自然对话，而不是在念稿子。',
@@ -11,52 +8,61 @@ const SYSTEM_PROMPTS = {
 };
 
 const AiService = {
-  async callDeepSeek(prompt, content) {
-    if (API_KEY === 'YOUR_DEEPSEEK_API_KEY') {
-      throw new Error('请先在 utils/ai.js 中配置 DeepSeek API Key');
+  async callDeepSeek(prompt, content, onTextCallback) {
+    // 检查基础库版本（需要 3.7.1+）
+    if (!wx.cloud || !wx.cloud.extend || !wx.cloud.extend.AI) {
+      throw new Error('当前基础库版本过低，请使用 3.7.1 或以上版本以使用 AI 能力');
     }
 
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: BASE_URL,
-        method: 'POST',
-        header: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
+    try {
+      // 创建混元模型
+      const model = wx.cloud.extend.AI.createModel("hunyuan-exp");
+      
+      // 使用 streamText 流式获取文本
+      const res = await model.streamText({
         data: {
-          model: 'deepseek-chat',
+          model: "hunyuan-turbos-latest",
           messages: [
-            { role: 'system', content: prompt },
-            { role: 'user', content: content }
+            { role: "system", content: prompt },
+            { role: "user", content: content }
           ],
           temperature: 0.7
-        },
-        success: (res) => {
-          if (res.statusCode === 200) {
-            resolve(res.data.choices[0].message.content);
-          } else {
-            reject(new Error(res.data.error?.message || '请求失败'));
-          }
-        },
-        fail: (err) => {
-          reject(err);
         }
       });
-    });
+
+      // 遍历 textStream 收集完整的文本流
+      let fullText = '';
+      for await (let text of res.textStream) {
+        fullText += text;
+        if (onTextCallback && typeof onTextCallback === 'function') {
+          onTextCallback(fullText);
+        }
+      }
+
+      console.log("AI 生成完成，内容长度：", fullText.length);
+      return fullText;
+    } catch (err) {
+      console.error('AI 调用失败：', err);
+      
+      // 401 错误特殊处理
+      if (err.errMsg && err.errMsg.includes('401')) {
+        throw new Error('AI 服务认证失败。请检查：\n1. 云开发控制台是否已开启 AI 服务\n2. 是否已配置混元模型权限\n3. 环境 ID 是否正确');
+      }
+      
+      throw new Error(err.message || err.errMsg || 'AI 请求失败，请检查网络或配置');
+    }
   },
 
-  async refineCard(action, card, projectContext = '') {
+  async refineCard(action, card, projectContext = '', onTextCallback) {
     const prompt = SYSTEM_PROMPTS[action];
     const content = `项目背景：${projectContext}\n当前积木标题：${card.title}\n当前积木内容：${card.content}`;
-    return this.callDeepSeek(prompt, content);
+    return this.callDeepSeek(prompt, content, onTextCallback);
   },
 
   async generateQuotes(card) {
     const prompt = SYSTEM_PROMPTS.quote;
     const content = `段落内容：${card.content}`;
     const result = await this.callDeepSeek(prompt, content);
-    // 简单的解析逻辑，假设 AI 返回 1. xxx 2. xxx 3. xxx
     return result.split('\n').filter(line => line.trim().match(/^\d\./)).map(line => line.replace(/^\d\.\s*/, '').trim());
   },
 
@@ -69,4 +75,3 @@ const AiService = {
 };
 
 module.exports = AiService;
-

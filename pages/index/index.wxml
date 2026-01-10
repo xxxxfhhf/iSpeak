@@ -145,7 +145,7 @@
 
   <!-- AI 菜单 -->
   <view class="ai-menu-mask" wx:if="{{showAiMenu}}" bindtap="hideAiMenu">
-    <view class="ai-menu" catchtap="true">
+    <view class="ai-menu" catchtap="preventBubble">
       <view class="ai-menu-title">✨ AI 改写/填充</view>
       <view class="ai-menu-item" bindtap="doAiAction" data-action="fill">填充内容 (基于骨架生成详情)</view>
       <view class="ai-menu-item" bindtap="doAiAction" data-action="oral">口语化</view>

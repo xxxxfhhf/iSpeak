@@ -272,8 +272,11 @@ Page({
           ...quotes.map(q => ({ text: q, pinned: false }))
         ];
       } else {
-        const result = await AiService.refineCard(action, card, this.data.project.title);
-        card.content = result;
+        // 实现流式更新 UI
+        await AiService.refineCard(action, card, this.data.project.title, (text) => {
+          card.content = text;
+          this.setData({ cards: this.data.cards });
+        });
         card.isAi = true; // 标记为 AI 生成
       }
       
@@ -355,6 +358,10 @@ Page({
     wx.reLaunch({
       url: '/pages/history/history'
     });
+  },
+
+  preventBubble() {
+    // 阻止冒泡
   },
 
   // 拖拽排序逻辑

@@ -78,3 +78,23 @@
 - **搜索过滤**：顶部增加搜索框，支持按标题或类型快速检索历史稿件。
 - **导航优化**：在编辑器左上角增加“🏠”入口，方便快速切换稿件。
 
+### 11. 云开发环境配置 (V5)
+- **云函数根目录**：在 `project.config.json` 中配置了 `cloudfunctionRoot: "cloudfunctions/"`。
+- **DeepSeek 转发云函数**：创建了 `agent-ispeak-7gnzkahf0ef22dd6` 云函数（根据用户已有配置命名），用于安全地请求 AI 接口。
+- **云开发初始化**：在 `app.js` 中增加了 `wx.cloud.init` 逻辑。
+- **AI 服务重构**：更新了 `utils/ai.js`，将原本的 `wx.request` 替换为调用云函数 `wx.cloud.callFunction`，并适配了新的函数名。
+- **环境变量安全优化**：将 `API_KEY` 从代码中彻底移除，改为在云函数中通过 `process.env.DEEPSEEK_API_KEY` 获取。
+
+### 12. 升级为小程序直接调用 AI (V6 - 重大优化)
+- **架构简化**：不再依赖云函数中转，直接使用小程序基础库 3.7.1+ 内置的 `wx.cloud.extend.AI` 能力。
+- **AI 服务重构**：
+  - 使用 `wx.cloud.extend.AI.createModel("hunyuan-exp")` 创建混元模型。
+  - **流式调用优化**：采用 `model.streamText()` 替代同步调用，支持 SSE（Server-Sent Events）实时响应。
+  - **实时 UI 更新**：在 `utils/ai.js` 中封装了异步迭代器处理逻辑，并在 `pages/index/index.js` 中实现了打字机式的实时内容输出效果。
+  - 调用模型：`hunyuan-turbos-latest`（腾讯混元最新版本）。
+- **优势**：
+  - **极致体验**：打字机式实时生成内容，用户感知更流畅。
+  - **零配置**：无需管理云函数、环境变量、API Key，腾讯云自动托管。
+  - **高稳定性**：直连腾讯云 AI 基础设施，响应极快。
+- **基础库要求**：小程序基础库需 3.7.1 或以上版本（已在代码中增加版本检测）。
+
