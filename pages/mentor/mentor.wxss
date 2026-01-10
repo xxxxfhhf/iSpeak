@@ -1,0 +1,166 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f8f8;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.back-btn {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.export-btn {
+  font-size: 28rpx;
+  color: #007aff;
+  font-weight: bold;
+}
+
+.mentor-intro {
+  padding: 40rpx 30rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.mentor-avatar {
+  font-size: 60rpx;
+}
+
+.mentor-speech {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+  background-color: #f0f7ff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  position: relative;
+}
+
+.ai-identity-note {
+  font-size: 20rpx;
+  color: #007aff;
+  opacity: 0.6;
+  margin-top: 10rpx;
+  text-align: right;
+}
+
+.mentor-speech::before {
+  content: '';
+  position: absolute;
+  left: -12rpx;
+  top: 30rpx;
+  border-right: 12rpx solid #f0f7ff;
+  border-top: 12rpx solid transparent;
+  border-bottom: 12rpx solid transparent;
+}
+
+.suggestion-area {
+  flex: 1;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+}
+
+.section {
+  margin-bottom: 40rpx;
+}
+
+.section-header {
+  padding: 20rpx 0;
+}
+
+.section-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #666;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.suggestion-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.02);
+  border-left: 8rpx solid #007aff;
+}
+
+.suggestion-card.completed {
+  border-left-color: #4cd964;
+  opacity: 0.8;
+}
+
+.card-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-bottom: 16rpx;
+  background-color: #eee;
+  color: #666;
+}
+
+.card-tag.structure { background-color: #ff9500; color: #fff; }
+.card-tag.expression { background-color: #5856d6; color: #fff; }
+.card-tag.completed { background-color: #4cd964; color: #fff; }
+
+.suggestion-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.suggestion-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid #ddd;
+  color: #666;
+}
+
+.action-btn.primary {
+  background-color: #007aff;
+  color: #fff;
+  border-color: #007aff;
+}
+
+.action-btn.finish {
+  color: #4cd964;
+  border-color: #4cd964;
+}
+
+.action-btn.ignore {
+  color: #ff3b30;
+}
+

@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="onBack">返回项目 </view>
+    <view class="export-btn" bindtap="onExportSuggestions"> 📋 导出建议 </view>
+  </view>
+
+  <view class="mentor-intro">
+    <view class="mentor-avatar">🎓</view>
+    <view class="mentor-speech">
+      <view>{{pendingSuggestions.length > 0 ? '这份演讲稿很有潜力，建议从以下环节精进...' : '目前做得很好！可以继续打磨细节或开始排练。'}}</view>
+      <view class="ai-identity-note">—— 内容由人工智能生成</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="suggestion-area">
+    <!-- 待处理建议 -->
+    <view class="section">
+      <view class="section-header" bindtap="toggleSection" data-section="pending">
+        <text class="section-title">▼ 🔴 待处理建议 ({{pendingSuggestions.length}})</text>
+      </view>
+      <view class="suggestion-list" wx:if="{{showPending}}">
+        <view class="suggestion-card" wx:for="{{pendingSuggestions}}" wx:key="id">
+          <view class="card-tag {{item.type}}">{{item.typeLabel}}</view>
+          <view class="suggestion-title">{{item.title}}</view>
+          <text class="suggestion-text">{{item.text}}</text>
+          <view class="card-actions">
+            <view class="action-btn ignore" bindtap="onIgnore" data-id="{{item.id}}">忽略</view>
+            <view class="action-btn finish" bindtap="onComplete" data-id="{{item.id}}">标记完成</view>
+            <view class="action-btn primary" bindtap="onProcess" data-id="{{item.id}}">去处理</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 已完成建议 -->
+    <view class="section">
+      <view class="section-header" bindtap="toggleSection" data-section="completed">
+        <text class="section-title">▼ 🟢 已完成建议 ({{completedSuggestions.length}})</text>
+      </view>
+      <view class="suggestion-list" wx:if="{{showCompleted}}">
+        <view class="suggestion-card completed" wx:for="{{completedSuggestions}}" wx:key="id">
+          <view class="card-tag completed">已完成</view>
+          <view class="suggestion-title">{{item.title}}</view>
+          <text class="suggestion-text">{{item.text}}</text>
+          <view class="card-actions">
+            <view class="action-btn" bindtap="onRevert" data-id="{{item.id}}">撤回</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+

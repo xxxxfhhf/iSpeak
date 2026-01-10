@@ -2,7 +2,8 @@
   "pages": [
     "pages/history/history",
     "pages/index/index",
-    "pages/preview/preview"
+    "pages/preview/preview",
+    "pages/mentor/mentor"
   ],
   "window": {
     "backgroundTextStyle": "light",

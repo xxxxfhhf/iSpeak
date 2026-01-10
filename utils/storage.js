@@ -23,12 +23,16 @@ const Storage = {
     wx.setStorageSync(PROJECTS_KEY, projects);
   },
 
-  // 保存项目详细数据（卡片列表）
+  // 保存项目详细数据（卡片列表及导师建议）
   saveProjectData(id, data) {
     const cards = data.cards || [];
     const totalDurationSec = cards.reduce((sum, c) => sum + (c.durationSec || 0), 0);
     const hasUnconfirmedAi = cards.some(c => c.isAi);
     const progress = cards.filter(c => c.content).length / (cards.length || 1);
+    
+    // 导师建议相关的元数据
+    const suggestions = data.mentorSuggestions || [];
+    const pendingSuggestionCount = suggestions.filter(s => s.status === 'pending').length;
 
     wx.setStorageSync(`project_${id}`, {
       ...data,
@@ -41,7 +45,8 @@ const Storage = {
       cardCount: cards.length,
       totalDurationSec,
       hasUnconfirmedAi,
-      progress
+      progress,
+      pendingSuggestionCount
     });
   },
 

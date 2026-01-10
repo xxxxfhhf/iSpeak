@@ -1,11 +1,12 @@
 <view class="container">
   <view class="header">
-    <view class="back-btn" bindtap="onBack"> &lt; 返回编辑 </view>
+    <view class="back-btn" bindtap="onBack"> 返回编辑 </view>
     <view class="copy-btn" bindtap="onCopy"> 📋 一键复制 Markdown </view>
   </view>
 
   <scroll-view scroll-y class="preview-area">
     <view class="markdown-content">
+      <view class="ai-preview-notice">本稿件由人工智能辅助生成，请注意核实内容的准确性。</view>
       <view class="md-h1"># {{project.title}}</view>
       <view class="md-info">预估总时长：{{totalDurationStr}} (约 {{totalWordCount}} 字)</view>
 

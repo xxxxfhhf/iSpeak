@@ -24,9 +24,8 @@ Page({
     showAiMenu: false,
     aiTargetCardId: null,
     
-    // AI 协作看板
-    suggestions: [],
-    showAiHub: true,
+    // AI 导师建议
+    pendingSuggestionCount: 0,
 
     // 拖拽相关
     isDragging: false,
@@ -83,9 +82,14 @@ Page({
           placeholder: typeInfo.placeholder
         };
       });
+
+      const suggestions = projectData.mentorSuggestions || [];
+      const pendingSuggestionCount = suggestions.filter(s => s.status === 'pending').length;
+
       this.setData({
         project: projectMeta,
-        cards
+        cards,
+        pendingSuggestionCount
       }, () => {
         this.calculateTotalDuration();
       });
@@ -294,58 +298,55 @@ Page({
     }
   },
 
-  async onAiComplete() {
-    wx.showLoading({ title: '分析结构中...' });
+  async onConsultMentor() {
+    wx.showLoading({ title: '导师正在阅卷...' });
     try {
       const result = await AiService.analyzeStructure(this.data.cards, this.data.project.title);
       wx.hideLoading();
       
-      // 将 AI 建议转化为 Todo List
-      const lines = result.split('\n').filter(l => l.trim().length > 5);
-      const newSuggestions = lines.slice(0, 3).map((text, i) => ({
-        id: Date.now() + i,
-        text: text.replace(/^\d\.\s*/, ''),
-        btnText: text.includes('CTA') || text.includes('结尾') ? '去补齐' : '去优化'
-      }));
-
-      this.setData({ 
-        suggestions: [...this.data.suggestions, ...newSuggestions],
-        showAiHub: true
+      // 精准解析：匹配 "建议X：标题" 和 "内容：指导"
+      const suggestions = [];
+      const sections = result.split(/建议\d：|建议\d:/).filter(s => s.trim().length > 10);
+      
+      const newItems = sections.map((section, i) => {
+        const lines = section.trim().split('\n');
+        const title = lines[0].replace(/\[|\]/g, '').trim();
+        const content = lines.slice(1).join('\n').replace(/内容：|内容:/, '').trim();
+        
+        return {
+          id: Date.now() + i,
+          title: title || '精进建议',
+          text: content,
+          status: 'pending'
+        };
       });
 
-      wx.showToast({ title: '已更新协作建议', icon: 'success' });
+      const projectData = Storage.getProject(this.data.project.id);
+      projectData.mentorSuggestions = [...(projectData.mentorSuggestions || []), ...newItems];
+      Storage.saveProjectData(this.data.project.id, projectData);
+      
+      this.setData({ 
+        pendingSuggestionCount: projectData.mentorSuggestions.filter(s => s.status === 'pending').length 
+      });
+
+      wx.showModal({
+        title: '咨询完成',
+        content: `导师为你准备了 ${newItems.length} 条新建议，已放入导师空间。`,
+        confirmText: '去看看',
+        success: (res) => {
+          if (res.confirm) this.onGoToMentor();
+        }
+      });
     } catch (err) {
       wx.hideLoading();
-      wx.showModal({
-        title: '分析失败',
-        content: err.message,
-        showCancel: false
-      });
+      wx.showToast({ title: '咨询失败，请重试', icon: 'none' });
     }
   },
 
-  toggleAiHub() {
-    this.setData({ showAiHub: !this.data.showAiHub });
-  },
-
-  onIgnoreSuggestion(e) {
-    const { id } = e.currentTarget.dataset;
-    const suggestions = this.data.suggestions.filter(s => s.id !== id);
-    this.setData({ suggestions });
-  },
-
-  onProcessSuggestion(e) {
-    const { id } = e.currentTarget.dataset;
-    const suggestion = this.data.suggestions.find(s => s.id === id);
-    
-    // 简单的联动：如果包含特定关键词，执行操作
-    if (suggestion.text.includes('CTA')) {
-      this.onAddNewCard(); // 简单示例：直接加个新卡
-    }
-    
-    // 处理后移除
-    this.onIgnoreSuggestion(e);
-    wx.showToast({ title: '请开始创作', icon: 'none' });
+  onGoToMentor() {
+    wx.navigateTo({
+      url: `/pages/mentor/mentor?id=${this.data.project.id}`
+    });
   },
 
   onGoToPreview() {

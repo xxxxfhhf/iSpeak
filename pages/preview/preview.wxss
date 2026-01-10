@@ -31,6 +31,16 @@
   box-sizing: border-box;
 }
 
+.ai-preview-notice {
+  font-size: 22rpx;
+  color: #999;
+  background-color: #f9f9f9;
+  padding: 16rpx 24rpx;
+  border-radius: 8rpx;
+  margin-bottom: 40rpx;
+  border-left: 6rpx solid #ddd;
+}
+
 .markdown-content {
   color: #333;
   line-height: 1.8;

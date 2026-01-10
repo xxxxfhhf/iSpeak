@@ -82,6 +82,33 @@ Page({
       md += `\n`;
     });
 
+    // 附录：AI 导师优化建议
+    const projectData = Storage.getProject(this.data.project.id);
+    if (projectData && projectData.mentorSuggestions && projectData.mentorSuggestions.length > 0) {
+      md += `---\n\n`;
+      md += `# 【附录：AI 导师优化记录】\n\n`;
+      md += `> 以下记录了 AI 导师为您提供的精进建议，帮助您回顾打磨过程。\n\n`;
+
+      const pending = projectData.mentorSuggestions.filter(s => s.status === 'pending');
+      const completed = projectData.mentorSuggestions.filter(s => s.status === 'completed');
+
+      if (pending.length > 0) {
+        md += `### 🔴 待处理建议\n\n`;
+        pending.forEach(s => {
+          md += `* **[导师建议]** ${s.text}\n`;
+        });
+        md += `\n`;
+      }
+
+      if (completed.length > 0) {
+        md += `### 🟢 已完成建议\n\n`;
+        completed.forEach(s => {
+          md += `* ~~**[导师建议]** ${s.text}~~\n`;
+        });
+        md += `\n`;
+      }
+    }
+
     wx.setClipboardData({
       data: md,
       success: () => {

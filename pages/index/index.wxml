@@ -1,6 +1,7 @@
 <view class="container">
   <!-- 顶部项目信息 -->
   <view class="header">
+    <view class="ai-compliance-tag">本产品服务涉及人工智能生成技术</view>
     <view class="header-top">
       <view class="back-home" bindtap="onGoHome">🏠</view>
       <view class="structure-progress">
@@ -107,35 +108,20 @@
     </view>
   </scroll-view>
 
-  <!-- AI 协作看板 -->
-  <view class="ai-hub" wx:if="{{suggestions.length > 0}}">
-    <view class="ai-hub-header" bindtap="toggleAiHub">
-      <view class="ai-hub-title-box">
-        <text class="ai-hub-title">🤖 AI 协作看板</text>
-        <text class="ai-hub-count">{{suggestions.length}}</text>
-      </view>
-      <view class="ai-hub-toggle">{{showAiHub ? '收起' : '展开建议'}}</view>
-    </view>
-    <scroll-view scroll-y class="suggestion-list" wx:if="{{showAiHub}}">
-      <view class="suggestion-card" wx:for="{{suggestions}}" wx:key="id">
-        <text class="suggestion-text">{{item.text}}</text>
-        <view class="suggestion-actions">
-          <view class="suggestion-btn ignore" bindtap="onIgnoreSuggestion" data-id="{{item.id}}">忽略</view>
-          <view class="suggestion-btn" bindtap="onProcessSuggestion" data-id="{{item.id}}">{{item.btnText || '去处理'}}</view>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-
   <!-- 底部固定操作 -->
   <view class="footer">
     <view class="footer-btn" bindtap="onAddNewCard">
       <view class="footer-icon">➕</view>
       <text>加积木</text>
     </view>
-    <view class="footer-btn" bindtap="onAiComplete">
-      <view class="footer-icon">🤖</view>
-      <text>AI补齐</text>
+    <view class="footer-btn" bindtap="onConsultMentor">
+      <view class="footer-icon">✨</view>
+      <text>AI导师优化</text>
+    </view>
+    <view class="footer-btn" bindtap="onGoToMentor">
+      <view class="footer-icon">🎓</view>
+      <text>AI建议空间</text>
+      <view class="badge-dot" wx:if="{{pendingSuggestionCount > 0}}"></view>
     </view>
     <view class="footer-btn" bindtap="onGoToPreview">
       <view class="footer-icon">👁️</view>
