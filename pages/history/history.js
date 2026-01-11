@@ -7,11 +7,13 @@ Page({
     searchText: '',
     isSelectMode: false,
     selectedIds: {},
-    selectedCount: 0
+    selectedCount: 0,
+    showNewMenu: false
   },
 
   onShow() {
     this.loadProjects();
+    this.setData({ showNewMenu: false }); // 每次显示页面时重置菜单
   },
 
   loadProjects() {
@@ -77,9 +79,42 @@ Page({
   },
 
   onNewProject() {
+    this.closeNewMenu();
     const id = Storage.createProject();
     wx.navigateTo({
       url: `/pages/index/index?id=${id}`
+    });
+  },
+
+  toggleNewMenu() {
+    this.setData({ showNewMenu: !this.data.showNewMenu });
+  },
+
+  closeNewMenu() {
+    this.setData({ showNewMenu: false });
+  },
+
+  preventBubble() {
+    // 阻止冒泡，防止点击菜单时关闭菜单
+  },
+
+  onGoToLibrary() {
+    wx.navigateTo({
+      url: '/pages/library/library'
+    });
+  },
+
+  onNewAiWizard() {
+    this.closeNewMenu();
+    wx.navigateTo({
+      url: '/pages/wizard/wizard'
+    });
+  },
+
+  onNewFromTemplate() {
+    this.closeNewMenu();
+    wx.navigateTo({
+      url: '/pages/templates/templates'
     });
   },
 

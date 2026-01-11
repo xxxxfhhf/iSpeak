@@ -1,0 +1,351 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f8f8;
+}
+
+/* 进度条 */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 60rpx;
+  background-color: #fff;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-num {
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 50%;
+  background-color: #eee;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+  transition: all 0.3s;
+}
+
+.step-item text {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.step-item.active .step-num {
+  background-color: #007aff;
+  color: #fff;
+}
+
+.step-item.active text {
+  color: #007aff;
+}
+
+.step-line {
+  flex: 1;
+  height: 4rpx;
+  background-color: #eee;
+  margin: 0 20rpx;
+  margin-top: -30rpx; /* 对齐圆圈中心 */
+}
+
+.step-line.active {
+  background-color: #007aff;
+}
+
+/* 步骤内容容器 */
+.step-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 40rpx;
+  overflow: hidden;
+}
+
+.step-header {
+  margin-bottom: 40rpx;
+}
+
+.step-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.step-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* Step 1: 碎片列表 */
+.fragments-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.fragment-item {
+  position: relative;
+  margin-bottom: 20rpx;
+}
+
+.fragment-input {
+  width: 100%;
+  min-height: 120rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+.fragment-delete {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 32rpx;
+}
+
+.add-fragment-btn {
+  padding: 30rpx;
+  text-align: center;
+  border: 2rpx dashed #ccc;
+  border-radius: 16rpx;
+  color: #666;
+  font-size: 28rpx;
+  margin-bottom: 40rpx;
+}
+
+/* Step 2: 表单 */
+.form-group {
+  margin-bottom: 40rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.form-input {
+  background-color: #fff;
+  height: 88rpx;
+  border-radius: 16rpx;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+}
+
+/* Step 3: 模版列表 */
+.templates-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.section-label {
+  font-size: 24rpx;
+  color: #999;
+  margin: 30rpx 0 16rpx;
+}
+
+.template-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.template-card.selected {
+  border-color: #007aff;
+  background-color: #f0f7ff;
+}
+
+.template-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.template-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.select-radio {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 2rpx solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.template-card.selected .select-radio {
+  border-color: #007aff;
+  background-color: #fff;
+}
+
+.radio-inner {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #007aff;
+}
+
+.template-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.template-card.recommended {
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.1);
+}
+
+.template-reason {
+  font-size: 24rpx;
+  color: #e6a23c;
+  background-color: #fdf6ec;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 10rpx;
+  line-height: 1.4;
+}
+
+.template-advice {
+  font-size: 22rpx;
+  color: #666;
+  padding: 0 10rpx;
+}
+
+
+/* 底部按钮栏 */
+.step-footer {
+  padding: 30rpx 0;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+  display: flex;
+  gap: 20rpx;
+}
+
+.prev-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  color: #666;
+  font-weight: bold;
+}
+
+.next-btn {
+  flex: 2;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  color: #999;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.next-btn.primary {
+  background-color: #007aff;
+  color: #fff;
+  box-shadow: 0 6rpx 16rpx rgba(0, 122, 255, 0.3);
+}
+
+.next-btn.disabled {
+  opacity: 0.6;
+}
+
+/* 生成中遮罩 */
+.generating-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.generating-card {
+  width: 500rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  padding: 50rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-icon {
+  font-size: 60rpx;
+  margin-bottom: 30rpx;
+  animation: bounce 1s infinite;
+}
+
+.generating-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.generating-tip {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background-color: #eee;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-inner {
+  height: 100%;
+  background-color: #007aff;
+  transition: width 0.3s;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10rpx); }
+}

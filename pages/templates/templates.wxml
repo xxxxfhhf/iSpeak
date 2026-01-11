@@ -1,0 +1,51 @@
+<view class="container">
+  <!-- 顶部 Tabs -->
+  <scroll-view scroll-x class="tabs-scroll" enable-flex>
+    <view class="tabs-container">
+      <block wx:for="{{categories}}" wx:key="id">
+        <view class="tab-item {{activeCategory === item.id ? 'active' : ''}}" 
+              bindtap="onCategoryChange" 
+              data-id="{{item.id}}">
+          {{item.name}}
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <!-- 模版列表 -->
+  <scroll-view scroll-y class="templates-list">
+    <block wx:for="{{filteredTemplates}}" wx:key="id">
+      <view class="template-card" bindtap="onSelectTemplate" data-id="{{item.id}}">
+        <view class="card-header">
+          <view class="card-title-row">
+            <text class="template-name">{{item.name}}</text>
+            <view class="tags-row">
+              <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+          </view>
+          <text class="template-desc">{{item.description}}</text>
+        </view>
+
+        <view class="structure-preview">
+          <view class="preview-line"></view>
+          <block wx:for="{{item.structure}}" wx:for-item="step" wx:for-index="idx" wx:key="idx">
+            <view class="structure-step" wx:if="{{idx < 4}}">
+              <view class="step-dot"></view>
+              <text class="step-text">{{step.title}}</text>
+            </view>
+          </block>
+          <view class="structure-step" wx:if="{{item.structure.length > 4}}">
+            <view class="step-dot small"></view>
+            <text class="step-text more">...</text>
+          </view>
+        </view>
+
+        <view class="card-footer">
+          <view class="use-btn">使用此模版</view>
+        </view>
+      </view>
+    </block>
+    
+    <view class="empty-space"></view>
+  </scroll-view>
+</view>

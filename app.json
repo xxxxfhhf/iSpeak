@@ -3,7 +3,10 @@
     "pages/history/history",
     "pages/index/index",
     "pages/preview/preview",
-    "pages/mentor/mentor"
+    "pages/mentor/mentor",
+    "pages/wizard/wizard",
+    "pages/library/library",
+    "pages/templates/templates"
   ],
   "window": {
     "backgroundTextStyle": "light",

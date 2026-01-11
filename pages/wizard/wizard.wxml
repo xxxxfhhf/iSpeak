@@ -1,0 +1,139 @@
+<view class="container">
+  <!-- 顶部进度条 -->
+  <view class="progress-steps">
+    <view class="step-item {{currentStep >= 1 ? 'active' : ''}}">
+      <view class="step-num">1</view>
+      <text>碎片</text>
+    </view>
+    <view class="step-line {{currentStep >= 2 ? 'active' : ''}}"></view>
+    <view class="step-item {{currentStep >= 2 ? 'active' : ''}}">
+      <view class="step-num">2</view>
+      <text>目标</text>
+    </view>
+    <view class="step-line {{currentStep >= 3 ? 'active' : ''}}"></view>
+    <view class="step-item {{currentStep >= 3 ? 'active' : ''}}">
+      <view class="step-num">3</view>
+      <text>生成</text>
+    </view>
+  </view>
+
+  <!-- Step 1: 碎片输入 -->
+  <view class="step-content" wx:if="{{currentStep === 1}}">
+    <view class="step-header">
+      <text class="step-title">倒出你的想法 🧠</text>
+      <text class="step-desc">无需整理，把脑海中的灵感、金句、故事片段全部写下来。</text>
+    </view>
+    
+    <scroll-view scroll-y class="fragments-list">
+      <block wx:for="{{fragments}}" wx:key="index">
+        <view class="fragment-item">
+          <textarea 
+            class="fragment-input" 
+            placeholder="输入一条碎片想法..." 
+            value="{{item}}" 
+            data-index="{{index}}"
+            bindinput="onFragmentInput" 
+            auto-height
+            maxlength="-1"
+          />
+          <view class="fragment-delete" catchtap="onDeleteFragment" data-index="{{index}}" wx:if="{{fragments.length > 1}}">×</view>
+        </view>
+      </block>
+      <view class="add-fragment-btn" bindtap="onAddFragment">
+        <text>+ 添加下一条碎片</text>
+      </view>
+    </scroll-view>
+
+    <view class="step-footer">
+      <view class="next-btn {{hasContent ? 'primary' : 'disabled'}}" bindtap="onNextStep">下一步</view>
+    </view>
+  </view>
+
+  <!-- Step 2: 目标设定 -->
+  <view class="step-content" wx:if="{{currentStep === 2}}">
+    <view class="step-header">
+      <text class="step-title">设定航向 🧭</text>
+      <text class="step-desc">告诉 AI 这次演讲的目的是什么，听众是谁。</text>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">🎯 演讲目标</view>
+      <input class="form-input" placeholder="例如：让老板批准我的年度预算" value="{{goal}}" bindinput="onGoalInput" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">👥 听众对象</view>
+      <input class="form-input" placeholder="例如：财务总监、部门经理" value="{{audience}}" bindinput="onAudienceInput" />
+    </view>
+
+    <view class="step-footer">
+      <view class="prev-btn" bindtap="onPrevStep">上一步</view>
+      <view class="next-btn {{goal && audience ? 'primary' : 'disabled'}}" bindtap="onRecommendTemplate">
+        {{isRecommending ? 'AI 正在分析...' : '智能推荐模版'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- Step 3: 模版选择与生成 -->
+  <view class="step-content" wx:if="{{currentStep === 3}}">
+    <view class="step-header">
+      <text class="step-title">选择架构 📐</text>
+      <text class="step-desc">AI 为你推荐了以下结构，选择一个开始构建。</text>
+    </view>
+
+    <scroll-view scroll-y class="templates-list">
+      <!-- AI 推荐 -->
+      <view class="section-label" wx:if="{{recommendations.length > 0}}">✨ AI 强力推荐</view>
+      <block wx:for="{{recommendations}}" wx:key="templateId">
+        <view class="template-card recommended {{selectedTemplateId === item.templateId ? 'selected' : ''}}" 
+              bindtap="onSelectTemplate" 
+              data-id="{{item.templateId}}">
+          <view class="template-header">
+            <text class="template-name">{{templateMap[item.templateId].name}}</text>
+            <view class="select-radio">
+              <view class="radio-inner" wx:if="{{selectedTemplateId === item.templateId}}"></view>
+            </view>
+          </view>
+          <view class="template-reason">💡 {{item.reason}}</view>
+          <view class="template-advice" wx:if="{{item.mapping_advice}}">👉 {{item.mapping_advice}}</view>
+        </view>
+      </block>
+
+      <!-- 其他模版 -->
+      <view class="section-label">更多通用模版</view>
+      <block wx:for="{{allTemplates}}" wx:key="id">
+        <view class="template-card {{selectedTemplateId === item.id ? 'selected' : ''}}" 
+              wx:if="{{!recMap[item.id]}}"
+              bindtap="onSelectTemplate" 
+              data-id="{{item.id}}">
+          <view class="template-header">
+            <text class="template-name">{{item.name}}</text>
+            <view class="select-radio">
+              <view class="radio-inner" wx:if="{{selectedTemplateId === item.id}}"></view>
+            </view>
+          </view>
+          <view class="template-desc">{{item.description}}</view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <view class="step-footer">
+      <view class="prev-btn" bindtap="onPrevStep" wx:if="{{!isGenerating}}">上一步</view>
+      <view class="next-btn primary" bindtap="onStartGenerate">
+        {{isGenerating ? '正在生成...' : '🚀 开始生成演讲稿'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 生成遮罩 -->
+  <view class="generating-mask" wx:if="{{isGenerating}}">
+    <view class="generating-card">
+      <view class="loading-icon">✨</view>
+      <text class="generating-title">AI 正在编织演讲稿...</text>
+      <text class="generating-tip">{{generatingStatus}}</text>
+      <view class="progress-bar">
+        <view class="progress-inner" style="width: {{generateProgress}}%"></view>
+      </view>
+    </view>
+  </view>
+</view>

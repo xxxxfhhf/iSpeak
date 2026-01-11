@@ -1,66 +1,99 @@
-<view class="container">
-  <view class="header">
-    <view class="search-box">
-      <icon type="search" size="14" />
-      <input class="search-input" placeholder="搜索标题或关键词..." bindinput="onSearch" value="{{searchText}}" />
+<view class="container"> 
+  <view class="header"> 
+    <view class="search-box"> 
+      <icon type="search" size="14" /> 
+      <input class="search-input" placeholder="搜索标题或关键词..." bindinput="onSearch" value="{{searchText}}" /> 
     </view>
-    <view class="new-btn" bindtap="onNewProject">➕ 新建</view>
-  </view>
-
-  <scroll-view scroll-y class="project-list">
-    <block wx:for="{{filteredProjects}}" wx:key="id">
-      <view 
-        class="project-card {{selectedIds[item.id] ? 'selected' : ''}}" 
-        bindtap="onProjectTap" 
-        bindlongpress="onProjectLongPress" 
-        data-id="{{item.id}}"
-      >
-        <view class="project-info">
-          <view class="project-title-row">
-            <text class="type-tag {{item.type}}">{{item.typeLabel}}</text>
-            <text class="project-title">{{item.title}}</text>
-            <view class="ai-indicator" wx:if="{{item.hasUnconfirmedAi}}">✨ AI</view>
-          </view>
-          
-          <view class="project-meta">
-            {{item.cardCount || 0}} 块积木 | 预估 {{item.durationStr}} | {{item.timeAgo}}
-          </view>
-
-          <!-- 结构进度条 -->
-          <view class="progress-bar-container">
-            <view class="progress-bar" style="width: {{item.progress * 100}}%"></view>
+    <view class="nav-btn library-btn" bindtap="onGoToLibrary" title="我的素材库">
+      📚
+    </view>
+    <view class="nav-btn new-btn-wrapper" catchtap="toggleNewMenu">
+      <view class="new-btn">➕ 新建</view>
+      <!-- 气泡菜单 -->
+      <view class="popover-menu {{showNewMenu ? 'show' : ''}}" catchtap="preventBubble">
+        <view class="menu-item ai-item" catchtap="onNewAiWizard">
+          <text class="menu-icon">✨</text>
+          <view class="menu-content">
+            <text class="menu-title">AI 灵感整合</text>
+            <text class="menu-desc">碎片整理 → 结构生成</text>
           </view>
         </view>
-
-        <view class="project-actions" wx:if="{{!isSelectMode}}">
-          <view class="action-item" catchtap="onGoToPreview" data-id="{{item.id}}">👁️ 预览</view>
-          <view class="action-item primary" catchtap="onGoToEdit" data-id="{{item.id}}">✏️ 编辑</view>
-          <view class="action-item danger" catchtap="onDelete" data-id="{{item.id}}">🗑️ 删除</view>
+        <view class="menu-divider"></view>
+        <view class="menu-item" catchtap="onNewFromTemplate">
+          <text class="menu-icon">📐</text>
+          <view class="menu-content">
+            <text class="menu-title">选择模版创建</text>
+            <text class="menu-desc">SCQA / 黄金圈 / 英雄之旅</text>
+          </view>
         </view>
-
-        <view class="select-icon" wx:if="{{isSelectMode}}">
-          <icon type="{{selectedIds[item.id] ? 'success' : 'circle'}}" size="22" color="{{selectedIds[item.id] ? '#007aff' : '#ccc'}}" />
+        <view class="menu-divider"></view>
+        <view class="menu-item" catchtap="onNewProject">
+          <text class="menu-icon">📝</text>
+          <view class="menu-content">
+            <text class="menu-title">空白项目</text>
+            <text class="menu-desc">手动搭建积木</text>
+          </view>
         </view>
       </view>
-    </block>
-
-    <view class="empty-state" wx:if="{{filteredProjects.length === 0}}">
-      <view class="empty-icon">📂</view>
-      <text>{{searchText ? '未找到相关稿件' : '还没有心血之作，开始创作吧'}}</text>
     </view>
+  </view> 
+ 
+  <!-- 遮罩层，用于点击外部关闭菜单 -->
+  <view class="mask" wx:if="{{showNewMenu}}" bindtap="closeNewMenu"></view>
 
-    <view class="list-footer" wx:if="{{filteredProjects.length > 0}}">
-      --- 到底啦，只有这 {{filteredProjects.length}} 篇心血之作 ---
-    </view>
-  </scroll-view>
-
-  <!-- 批量操作栏 -->
-  <view class="batch-bar" wx:if="{{isSelectMode}}">
-    <view class="batch-info">已选择 {{selectedCount}} 项</view>
-    <view class="batch-btns">
-      <view class="batch-btn cancel" bindtap="onCancelSelect">取消</view>
-      <view class="batch-btn delete" bindtap="onBatchDelete">删除 ({{selectedCount}})</view>
-    </view>
-  </view>
-</view>
-
+  <scroll-view scroll-y class="project-list"> 
+    <block wx:for="{{filteredProjects}}" wx:key="id"> 
+      <view  
+        class="project-card {{selectedIds[item.id] ? 'selected' : ''}}"  
+        bindtap="onProjectTap"  
+        bindlongpress="onProjectLongPress"  
+        data-id="{{item.id}}" 
+      > 
+        <view class="project-info"> 
+          <view class="project-title-row"> 
+            <text class="type-tag {{item.type}}">{{item.typeLabel}}</text> 
+            <text class="project-title">{{item.title}}</text> 
+            <view class="ai-indicator" wx:if="{{item.hasUnconfirmedAi}}">✨ AI</view> 
+          </view> 
+           
+          <view class="project-meta"> 
+            {{item.cardCount || 0}} 块积木 | 预估 {{item.durationStr}} | {{item.timeAgo}} 
+          </view> 
+ 
+          <!-- 结构进度条 --> 
+          <view class="progress-bar-container"> 
+            <view class="progress-bar" style="width: {{item.progress * 100}}%"></view> 
+          </view> 
+        </view> 
+ 
+        <view class="project-actions" wx:if="{{!isSelectMode}}"> 
+          <view class="action-item" catchtap="onGoToPreview" data-id="{{item.id}}">👁️ 预览</view> 
+          <view class="action-item primary" catchtap="onGoToEdit" data-id="{{item.id}}">✏️ 编辑</view> 
+          <view class="action-item danger" catchtap="onDelete" data-id="{{item.id}}">🗑️ 删除</view> 
+        </view> 
+ 
+        <view class="select-icon" wx:if="{{isSelectMode}}"> 
+          <icon type="{{selectedIds[item.id] ? 'success' : 'circle'}}" size="22" color="{{selectedIds[item.id] ? '#007aff' : '#ccc'}}" /> 
+        </view> 
+      </view> 
+    </block> 
+ 
+    <view class="empty-state" wx:if="{{filteredProjects.length === 0}}"> 
+      <view class="empty-icon">📂</view> 
+      <text>{{searchText ? '未找到相关稿件' : '还没有心血之作，开始创作吧'}}</text> 
+    </view> 
+ 
+    <view class="list-footer" wx:if="{{filteredProjects.length > 0}}"> 
+      --- 到底啦，只有这 {{filteredProjects.length}} 篇心血之作 --- 
+    </view> 
+  </scroll-view> 
+ 
+  <!-- 批量操作栏 --> 
+  <view class="batch-bar" wx:if="{{isSelectMode}}"> 
+    <view class="batch-info">已选择 {{selectedCount}} 项</view> 
+    <view class="batch-btns"> 
+      <view class="batch-btn cancel" bindtap="onCancelSelect">取消</view> 
+      <view class="batch-btn delete" bindtap="onBatchDelete">删除 ({{selectedCount}})</view> 
+    </view> 
+  </view> 
+</view> 

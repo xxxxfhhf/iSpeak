@@ -1,6 +1,10 @@
 const PROJECTS_KEY = 'projects';
+const LIBRARY_CASES_KEY = 'library_cases';
+const LIBRARY_FRAGMENTS_KEY = 'library_fragments';
 
 const Storage = {
+  // --- 核心项目相关 ---
+
   // 获取所有项目
   getProjects() {
     return wx.getStorageSync(PROJECTS_KEY) || [];
@@ -84,6 +88,54 @@ const Storage = {
     const projects = this.getProjects().filter(p => p.id !== id);
     wx.setStorageSync(PROJECTS_KEY, projects);
     wx.removeStorageSync(`project_${id}`);
+  },
+
+  // --- 素材库相关 ---
+
+  // 获取所有案例
+  getCases() {
+    return wx.getStorageSync(LIBRARY_CASES_KEY) || [];
+  },
+
+  // 保存案例 (新增/更新)
+  saveCase(item) {
+    const list = this.getCases();
+    const index = list.findIndex(i => i.id === item.id);
+    if (index > -1) {
+      list[index] = { ...list[index], ...item, updatedAt: Date.now() };
+    } else {
+      list.unshift({ ...item, id: item.id || Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() });
+    }
+    wx.setStorageSync(LIBRARY_CASES_KEY, list);
+  },
+
+  // 删除案例
+  deleteCase(id) {
+    const list = this.getCases().filter(i => i.id !== id);
+    wx.setStorageSync(LIBRARY_CASES_KEY, list);
+  },
+
+  // 获取所有碎片
+  getFragments() {
+    return wx.getStorageSync(LIBRARY_FRAGMENTS_KEY) || [];
+  },
+
+  // 保存碎片 (新增/更新)
+  saveFragment(item) {
+    const list = this.getFragments();
+    const index = list.findIndex(i => i.id === item.id);
+    if (index > -1) {
+      list[index] = { ...list[index], ...item, updatedAt: Date.now() };
+    } else {
+      list.unshift({ ...item, id: item.id || Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() });
+    }
+    wx.setStorageSync(LIBRARY_FRAGMENTS_KEY, list);
+  },
+
+  // 删除碎片
+  deleteFragment(id) {
+    const list = this.getFragments().filter(i => i.id !== id);
+    wx.setStorageSync(LIBRARY_FRAGMENTS_KEY, list);
   }
 };
 

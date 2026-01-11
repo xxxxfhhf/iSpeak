@@ -72,7 +72,48 @@ const SYSTEM_PROMPTS = {
 [引用] "金句内容" —— 出处
 [AI原创] "金句内容"`,
 
-  complete: '你是一位资深的演讲导师。请分析当前的演讲积木序列，并给出 3-5 条具有实操意义的精进建议。要求：\n1. 每个建议必须包含【标题】和【详细建议】。\n2. 涵盖结构完整性、情感起伏、节奏控制或金句质量。\n3. 输出格式严格按照：\n建议1：[标题]\n内容：[详细指导]\n建议2：[标题]\n内容：[详细指导]'
+  complete: '你是一位资深的演讲导师。请分析当前的演讲积木序列，并给出 3-5 条具有实操意义的精进建议。要求：\n1. 每个建议必须包含【标题】和【详细建议】。\n2. 涵盖结构完整性、情感起伏、节奏控制或金句质量。\n3. 输出格式严格按照：\n建议1：[标题]\n内容：[详细指导]\n建议2：[标题]\n内容：[详细指导]',
+
+  recommend: `你是一位敏锐的演讲架构师。请根据用户提供的【演讲目标】、【听众对象】和【灵感碎片】，从以下结构中推荐 1-2 个最合适的模版。
+可选模版 ID：
+- scqa (SCQA 职场汇报)：适合方案汇报、解决问题。
+- golden_circle (黄金圈法则)：适合愿景感召、产品发布。
+- hero_journey (英雄之旅)：适合个人成长故事、励志分享。
+- prep (PREP 观点表达)：适合即兴发言、清晰阐述。
+
+要求：
+1. 分析为什么推荐这个模版。
+2. 简要说明如何将用户的碎片放入该结构中。
+3. 输出 JSON 格式，不要包含 Markdown 标记：
+{
+  "recommendations": [
+    {
+      "templateId": "scqa",
+      "reason": "你的内容涉及职场问题解决...",
+      "mapping_advice": "将'预算不足'放在冲突环节..."
+    }
+  ]
+}`,
+
+  generate: `你是一位全能演讲撰稿人。请根据【选定模版结构】和【用户原始碎片】，创作一篇完整的演讲稿初稿。
+
+【输入信息】
+- 演讲目标：{{goal}}
+- 听众：{{audience}}
+- 模版结构：{{structure}}
+- 原始碎片：{{fragments}}
+
+【任务要求】
+1. 严格按照模版结构的顺序生成内容。
+2. 将用户的原始碎片自然地融入到各个环节中。
+3. 如果某些环节缺乏素材，请根据目标和逻辑进行合理的 AI 扩写。
+4. 保持口语化风格。
+5. 输出 JSON 格式，数组中的每一项对应结构中的一个环节：
+[
+  { "index": 0, "content": "生成的第一段内容..." },
+  { "index": 1, "content": "生成的第二段内容..." }
+]
+`
 };
 
 const AiService = {
@@ -223,6 +264,55 @@ ${card.content || '(内容为空，请给出该环节的案例或模版)'}`;
     const structure = cards.map((c, i) => `${i + 1}. [${c.typeLabel}] ${c.title}`).join('\n');
     const content = `演讲标题：${projectTitle}\n当前结构：\n${structure}`;
     return this.callDeepSeek(prompt, content, onTextCallback);
+  },
+
+  /**
+   * 推荐模版
+   */
+  async recommendTemplate(goal, audience, fragments) {
+    const prompt = SYSTEM_PROMPTS.recommend;
+    const content = `【演讲目标】${goal}\n【听众对象】${audience}\n【灵感碎片】\n${fragments.join('\n')}`;
+    
+    // 非流式调用，直接等待 JSON 结果
+    const result = await this.callDeepSeek(prompt, content);
+    try {
+      // 尝试清理可能存在的 Markdown 代码块标记
+      const jsonStr = result.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.error('解析推荐结果失败', e);
+      // 降级返回默认
+      return { recommendations: [{ templateId: 'scqa', reason: 'AI 解析失败，推荐通用模版', mapping_advice: '' }] };
+    }
+  },
+
+  /**
+   * 生成全篇项目内容
+   */
+  async generateProject(template, goal, audience, fragments, onTextCallback) {
+    let prompt = SYSTEM_PROMPTS.generate;
+    
+    // 构造结构描述字符串
+    const structureDesc = template.structure.map((s, i) => 
+      `第${i+1}段：[${s.title}] (${s.intent})`
+    ).join('\n');
+
+    // 简单的模版替换
+    prompt = prompt.replace('{{goal}}', goal)
+                   .replace('{{audience}}', audience)
+                   .replace('{{structure}}', structureDesc)
+                   .replace('{{fragments}}', fragments.join('\n'));
+
+    const content = "请开始生成，直接输出 JSON 数据。";
+    
+    const result = await this.callDeepSeek(prompt, content, onTextCallback);
+    try {
+      const jsonStr = result.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.error('解析生成结果失败', e);
+      return [];
+    }
   }
 };
 

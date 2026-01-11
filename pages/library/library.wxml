@@ -1,0 +1,104 @@
+<view class="container">
+  <!-- 顶部 Tabs -->
+  <view class="tabs">
+    <view class="tab-item {{activeTab === 'cases' ? 'active' : ''}}" bindtap="switchTab" data-tab="cases">
+      <text class="tab-text">📖 我的案例</text>
+      <view class="tab-line" wx:if="{{activeTab === 'cases'}}"></view>
+    </view>
+    <view class="tab-item {{activeTab === 'fragments' ? 'active' : ''}}" bindtap="switchTab" data-tab="fragments">
+      <text class="tab-text">🧩 灵感碎片</text>
+      <view class="tab-line" wx:if="{{activeTab === 'fragments'}}"></view>
+    </view>
+  </view>
+
+  <!-- 灵感碎片 Tab -->
+  <view class="tab-content" wx:if="{{activeTab === 'fragments'}}">
+    <view class="input-box">
+      <textarea 
+        class="fragment-input" 
+        placeholder="记录当下的灵感、金句或想法..." 
+        auto-height 
+        value="{{newFragmentContent}}"
+        bindinput="onFragmentInput"
+        maxlength="-1"
+      />
+      <view class="input-footer">
+        <view class="save-btn {{newFragmentContent ? 'primary' : ''}}" bindtap="onSaveFragment">保存碎片</view>
+      </view>
+    </view>
+
+    <scroll-view scroll-y class="list-scroll">
+      <block wx:for="{{fragments}}" wx:key="id">
+        <view class="card-item fragment">
+          <view class="card-body">
+            <text class="card-text">{{item.content}}</text>
+          </view>
+          <view class="card-footer">
+            <text class="card-time">{{item.timeStr}}</text>
+            <view class="card-actions">
+              <view class="action-btn" catchtap="onDeleteFragment" data-id="{{item.id}}">🗑️ 删除</view>
+              <view class="action-btn primary" catchtap="onUseFragment" data-content="{{item.content}}">✨ 去创作</view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view class="empty-tip" wx:if="{{fragments.length === 0}}">
+        还没有碎片，记录第一个灵感吧~
+      </view>
+      <view class="bottom-spacer"></view>
+    </scroll-view>
+  </view>
+
+  <!-- 我的案例 Tab -->
+  <view class="tab-content" wx:if="{{activeTab === 'cases'}}">
+    <view class="add-case-btn" bindtap="onAddCase">
+      <text>+ 新增一个完整案例</text>
+    </view>
+
+    <scroll-view scroll-y class="list-scroll">
+      <block wx:for="{{cases}}" wx:key="id">
+        <view class="card-item case">
+          <view class="card-header">
+            <text class="case-title">{{item.title}}</text>
+            <view class="tags">
+              <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+          </view>
+          <view class="card-body">
+            <text class="card-text multi-line">{{item.content}}</text>
+          </view>
+          <view class="card-footer">
+            <text class="card-time">{{item.timeStr}}</text>
+            <view class="card-actions">
+              <view class="action-btn" catchtap="onDeleteCase" data-id="{{item.id}}">🗑️ 删除</view>
+              <view class="action-btn" catchtap="onEditCase" data-id="{{item.id}}">✏️ 编辑</view>
+              <view class="action-btn primary" catchtap="onUseCase" data-content="{{item.content}}">✨ 去创作</view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view class="empty-tip" wx:if="{{cases.length === 0}}">
+        还没有案例，梳理一下你的高光时刻吧~
+      </view>
+      <view class="bottom-spacer"></view>
+    </scroll-view>
+  </view>
+
+  <!-- 案例编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{showCaseModal}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">{{editingCaseId ? '编辑案例' : '新增案例'}}</text>
+      </view>
+      <view class="modal-body">
+        <input class="modal-input" placeholder="给案例起个标题" value="{{editingCase.title}}" bindinput="onCaseTitleInput" />
+        <textarea class="modal-textarea" placeholder="详细描述这个案例..." value="{{editingCase.content}}" bindinput="onCaseContentInput" maxlength="-1" />
+        <input class="modal-input" placeholder="标签（用空格分隔，如：职场 失败）" value="{{editingCase.tagsStr}}" bindinput="onCaseTagsInput" />
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bindtap="closeCaseModal">取消</view>
+        <view class="modal-btn confirm" bindtap="saveCase">保存</view>
+      </view>
+    </view>
+  </view>
+</view>
