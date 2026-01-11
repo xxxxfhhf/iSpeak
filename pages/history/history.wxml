@@ -50,28 +50,34 @@
         data-id="{{item.id}}" 
       > 
         <view class="project-info"> 
-          <view class="project-title-row"> 
-            <text class="type-tag {{item.type}}">{{item.typeLabel}}</text> 
-            <text class="project-title">{{item.title}}</text> 
-            <view class="ai-indicator" wx:if="{{item.hasUnconfirmedAi}}">✨ AI</view> 
+          <view class="project-title-row">
+            <view class="title-wrapper">
+              <text class="project-title">{{item.title}}</text>
+              <view class="ai-indicator" wx:if="{{item.hasUnconfirmedAi}}">✨ AI</view>
+            </view>
+            
+            <!-- 更多操作按钮 -->
+            <view class="more-btn" catchtap="onShowActionSheet" data-id="{{item.id}}" data-title="{{item.title}}">
+              <text class="more-dot">···</text>
+            </view>
           </view> 
            
-          <view class="project-meta"> 
-            {{item.cardCount || 0}} 块积木 | 预估 {{item.durationStr}} | {{item.timeAgo}} 
+          <view class="project-meta-row"> 
+            <text class="type-tag {{item.type}}">{{item.typeLabel}}</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-text">{{item.durationStr}}</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-text">{{item.totalWordCount || 0}} 字</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-text">{{item.timeAgo}}</text>
           </view> 
- 
+
           <!-- 结构进度条 --> 
           <view class="progress-bar-container"> 
             <view class="progress-bar" style="width: {{item.progress * 100}}%"></view> 
           </view> 
         </view> 
- 
-        <view class="project-actions" wx:if="{{!isSelectMode}}"> 
-          <view class="action-item" catchtap="onGoToPreview" data-id="{{item.id}}">👁️ 预览</view> 
-          <view class="action-item primary" catchtap="onGoToEdit" data-id="{{item.id}}">✏️ 编辑</view> 
-          <view class="action-item danger" catchtap="onDelete" data-id="{{item.id}}">🗑️ 删除</view> 
-        </view> 
- 
+
         <view class="select-icon" wx:if="{{isSelectMode}}"> 
           <icon type="{{selectedIds[item.id] ? 'success' : 'circle'}}" size="22" color="{{selectedIds[item.id] ? '#007aff' : '#ccc'}}" /> 
         </view> 

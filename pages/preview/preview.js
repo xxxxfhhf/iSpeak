@@ -15,6 +15,19 @@ Page({
     }
   },
 
+  onShareAppMessage() {
+    return {
+      title: `预览：${this.data.project ? this.data.project.title : '演讲稿'}`,
+      path: `/pages/preview/preview?id=${this.data.project ? this.data.project.id : ''}`
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: `预览：${this.data.project ? this.data.project.title : '演讲稿'}`
+    };
+  },
+
   loadData(id) {
     const projectData = Storage.getProject(id);
     const projects = Storage.getProjects();

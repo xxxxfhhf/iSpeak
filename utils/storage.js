@@ -31,6 +31,9 @@ const Storage = {
   saveProjectData(id, data) {
     const cards = data.cards || [];
     const totalDurationSec = cards.reduce((sum, c) => sum + (c.durationSec || 0), 0);
+    // 计算总字数
+    const totalWordCount = cards.reduce((sum, c) => sum + (c.content ? c.content.length : 0), 0);
+    
     const hasUnconfirmedAi = cards.some(c => c.isAi);
     const progress = cards.filter(c => c.content).length / (cards.length || 1);
     
@@ -47,6 +50,7 @@ const Storage = {
     this.saveProjectMeta({ 
       id, 
       cardCount: cards.length,
+      totalWordCount, // 保存字数
       totalDurationSec,
       hasUnconfirmedAi,
       progress,

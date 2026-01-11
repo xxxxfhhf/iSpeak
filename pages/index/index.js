@@ -73,6 +73,19 @@ Page({
     this.setData({ typeIndexMap });
   },
 
+  onShareAppMessage() {
+    return {
+      title: this.data.project ? this.data.project.title : 'AI 演讲积木',
+      path: `/pages/index/index?id=${this.data.project ? this.data.project.id : ''}`
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: this.data.project ? this.data.project.title : 'AI 演讲积木'
+    };
+  },
+
   loadProject(id) {
     const projectData = Storage.getProject(id);
     const projects = Storage.getProjects();

@@ -13,7 +13,20 @@ Page({
 
   onShow() {
     this.loadProjects();
-    this.setData({ showNewMenu: false }); // 每次显示页面时重置菜单
+    this.setData({ showNewMenu: false });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: 'AI 演讲积木 - 让你的表达更有逻辑',
+      path: '/pages/history/history'
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: 'AI 演讲积木 - 让你的表达更有逻辑'
+    };
   },
 
   loadProjects() {
@@ -123,8 +136,39 @@ Page({
     if (this.data.isSelectMode) {
       this.toggleSelect(id);
     } else {
-      this.onGoToEdit(e);
+      // 点击卡片直接进入编辑页
+      wx.navigateTo({
+        url: `/pages/index/index?id=${id}`
+      });
     }
+  },
+
+  onShowActionSheet(e) {
+    const { id, title } = e.currentTarget.dataset;
+    wx.showActionSheet({
+      itemList: ['👁️ 预览全文', '✏️ 重命名', '🗑️ 删除'],
+      itemColor: '#000000',
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.navigateTo({
+            url: `/pages/preview/preview?id=${id}`
+          });
+        } else if (res.tapIndex === 1) {
+          this.showRenameModal(id, title);
+        } else if (res.tapIndex === 2) {
+          this.onDelete({ currentTarget: { dataset: { id } } });
+        }
+      }
+    });
+  },
+
+  // 重命名逻辑 (需要配合 WXML 弹窗，这里简单用 modal prompt 模拟，或者先只做入口)
+  showRenameModal(id, oldTitle) {
+    // 小程序原生没有带输入框的 modal，这里暂时跳转编辑页修改标题，或者忽略
+    wx.navigateTo({
+        url: `/pages/index/index?id=${id}`
+    });
+    wx.showToast({ title: '请在顶部修改标题', icon: 'none' });
   },
 
   onProjectLongPress(e) {
