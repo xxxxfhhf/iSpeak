@@ -9,7 +9,7 @@ const CARD_TYPES = [
   { type: 'insight', label: '洞见', defaultTitle: '感悟与金句', intent: '提炼价值，升华主题', placeholder: '从这段经历中你学到了什么？能不能用一句深刻的话总结它？' },
   { type: 'case', label: '案例', defaultTitle: '案例分享', intent: '支撑观点，增加可信度', placeholder: '给出一个具体的例子或细节，来证明你的洞见或方法是有效的...' },
   { type: 'ending', label: '结尾', defaultTitle: '结尾回扣', intent: '呼应开头，强化领悟', placeholder: '回扣开头的悬念，总结你的成长。让听众感受到完整性。' },
-  { type: 'cta', label: 'CTA', defaultTitle: '行动号召', intent: '指明方向，号召行动', placeholder: '你希望听众听完后立刻去做的一个具体动作是什么？' },
+  { type: 'cta', label: '号召', defaultTitle: '行动号召', intent: '指明方向，号召行动', placeholder: '你希望听众听完后立刻去做的一个具体动作是什么？' },
   { type: 'transition', label: '过渡', defaultTitle: '承上启下', intent: '衔接逻辑，平滑过渡', placeholder: '简单的一两句话，连接前后的两个积木模块...' }
 ];
 
@@ -26,6 +26,12 @@ Page({
     
     // AI 导师建议
     pendingSuggestionCount: 0,
+    isMentorThinking: false,
+    showMentorThinkingMask: false, // 是否显示流式阅卷弹窗
+    mentorThinkingText: '',
+    mentorSuggestions: [],
+    currentSuggestionIndex: 0,
+    showFloatingMentor: true,
 
     // 拖拽相关
     isDragging: false,
@@ -84,12 +90,15 @@ Page({
       });
 
       const suggestions = projectData.mentorSuggestions || [];
-      const pendingSuggestionCount = suggestions.filter(s => s.status === 'pending').length;
+      const pendingSuggestions = suggestions.filter(s => s.status === 'pending');
+      const pendingSuggestionCount = pendingSuggestions.length;
 
       this.setData({
         project: projectMeta,
         cards,
-        pendingSuggestionCount
+        mentorSuggestions: pendingSuggestions,
+        pendingSuggestionCount,
+        currentSuggestionIndex: 0
       }, () => {
         this.calculateTotalDuration();
       });
@@ -97,11 +106,24 @@ Page({
   },
 
   calculateTotalDuration() {
-    const totalSec = this.data.cards.reduce((sum, card) => sum + (card.durationSec || 0), 0);
+    const totalSec = this.data.cards.reduce((sum, card) => {
+      // 实时计算每张卡片的时长：150字/分钟 = 2.5字/秒
+      const content = card.content || '';
+      const charCount = content.trim().length;
+      // 基础时间 3s (即使没字也要预留停顿时间)，每 2.5 个字增加 1s
+      const duration = charCount > 0 ? Math.ceil(charCount / 2.5) : 0;
+      card.durationSec = duration;
+      card.wordCount = charCount; // 记录字数
+      return sum + duration;
+    }, 0);
+
     const min = Math.floor(totalSec / 60);
     const sec = totalSec % 60;
     const totalDurationStr = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    this.setData({ totalDurationStr });
+    this.setData({ 
+      cards: this.data.cards,
+      totalDurationStr 
+    });
   },
 
   onTitleChange(e) {
@@ -124,19 +146,8 @@ Page({
         card.isAi = false;
       }
       this.setData({ cards });
+      this.calculateTotalDuration();
       this.saveCards();
-    }
-  },
-
-  onConfirmAi(e) {
-    const { id } = e.currentTarget.dataset;
-    const cards = this.data.cards;
-    const card = cards.find(c => c.id === id);
-    if (card) {
-      card.isAi = false;
-      this.setData({ cards });
-      this.saveCards();
-      wx.vibrateShort({ type: 'light' });
     }
   },
 
@@ -197,7 +208,7 @@ Page({
       intent: defaultType.intent,
       placeholder: defaultType.placeholder,
       content: '',
-      durationSec: 20,
+      durationSec: 0,
       quotes: []
     };
     const cards = [...this.data.cards, newCard];
@@ -219,7 +230,7 @@ Page({
       intent: defaultType.intent,
       placeholder: defaultType.placeholder,
       content: '',
-      durationSec: 20,
+      durationSec: 0,
       quotes: []
     };
     const cards = [...this.data.cards];
@@ -260,52 +271,200 @@ Page({
   },
 
   async doAiAction(e) {
+    // 从菜单项获取操作类型：fill(填充)、oral(口语化)、vivid(画面感)、brief(精简)、quote(生成金句)
     const action = e.currentTarget.dataset.action;
+    // 获取之前通过 onAiAction 设置的目标卡片 ID
     const cardId = this.data.aiTargetCardId;
+    // 关闭 AI 菜单弹窗
     this.hideAiMenu();
 
+    // 在卡片列表中查找目标卡片
     const card = this.data.cards.find(c => c.id === cardId);
+    // 如果卡片不存在，直接返回（防止异常情况）
     if (!card) return;
 
+    // 显示加载提示，告知用户 AI 正在处理
     wx.showLoading({ title: 'AI 思考中...' });
     try {
+      // 分支处理：金句生成与其他优化操作使用不同的处理逻辑
       if (action === 'quote') {
+        // 金句生成：调用 AI 服务生成多条金句
         const quotes = await AiService.generateQuotes(card);
+        // 将新生成的金句追加到现有金句列表
         card.quotes = [
           ...card.quotes,
-          ...quotes.map(q => ({ text: q, pinned: false }))
+          ...quotes.map(q => ({ 
+            text: q.text, 
+            type: q.type, 
+            source: q.source, 
+            pinned: false 
+          }))
         ];
       } else {
-        // 实现流式更新 UI
+        // 其他优化操作（fill/oral/vivid/brief）：流式生成优化内容，但不立即覆盖原文
+        // 使用 tempAiContent 存储 AI 生成的临时内容，供用户预览对比
         await AiService.refineCard(action, card, this.data.project.title, (text) => {
-          card.content = text;
+          // 实时更新临时 AI 内容（流式文本累积）
+          card.tempAiContent = text;
+          // 触发视图更新，让用户看到实时生成的预览内容
           this.setData({ cards: this.data.cards });
         });
-        card.isAi = true; // 标记为 AI 生成
+        // 标记卡片正在进行 AI 协作状态
+        card.isAi = true;
       }
       
+      // 最终更新数据
       this.setData({ cards: this.data.cards });
-      this.saveCards();
+      // 保存金句变动（如果是 quote 模式）
+      if (action === 'quote') this.saveCards();
+      
       wx.hideLoading();
-      wx.showToast({ title: '已完成优化', icon: 'success' });
+      wx.showToast({ title: action === 'quote' ? '金句已生成' : 'AI 优化已就绪', icon: 'success' });
     } catch (err) {
       wx.hideLoading();
       wx.showModal({
         title: 'AI 优化失败',
-        content: err.message || '请检查网络或 API Key 配置',
+        content: err.message || '请检查网络或配置',
         showCancel: false
       });
     }
   },
 
+  /**
+   * AI 结果处理：替换原文
+   */
+  onAiAcceptReplace(e) {
+    const { id } = e.currentTarget.dataset;
+    const cards = this.data.cards;
+    const card = cards.find(c => c.id === id);
+    if (card && card.tempAiContent) {
+      card.content = card.tempAiContent; // 覆盖原文
+      card.tempAiContent = null;         // 清空临时内容
+      card.isAi = false;                 // 退出 AI 协作状态
+      this.setData({ cards });
+      this.calculateTotalDuration();
+      this.saveCards();
+      wx.vibrateShort({ type: 'medium' });
+      wx.showToast({ title: '已替换原文', icon: 'none' });
+    }
+  },
+
+  /**
+   * AI 结果处理：插入后行
+   */
+  onAiAcceptInsert(e) {
+    const { id } = e.currentTarget.dataset;
+    const index = this.data.cards.findIndex(c => c.id === id);
+    const card = this.data.cards[index];
+    
+    if (card && card.tempAiContent) {
+      // 创建新卡片，继承原卡片的部分属性（如类型），但使用 AI 生成的内容
+      const newCard = {
+        ...card,
+        id: Date.now().toString(),
+        content: card.tempAiContent,
+        tempAiContent: null,
+        isAi: false,
+        quotes: [] // 新卡片初始不携带原卡片的金句
+      };
+      
+      const cards = [...this.data.cards];
+      cards.splice(index + 1, 0, newCard); // 在当前卡片后插入
+      
+      // 原卡片恢复原状（退出 AI 状态）
+      card.tempAiContent = null;
+      card.isAi = false;
+      
+      this.setData({ cards }, () => {
+        this.calculateTotalDuration();
+        this.saveCards();
+      });
+      wx.vibrateShort({ type: 'medium' });
+      wx.showToast({ title: '已作为新积木插入', icon: 'none' });
+    }
+  },
+
+  /**
+   * AI 结果处理：放弃修改
+   */
+  onAiDiscard(e) {
+    const { id } = e.currentTarget.dataset;
+    const cards = this.data.cards;
+    const card = cards.find(c => c.id === id);
+    if (card) {
+      card.tempAiContent = null;
+      card.isAi = false;
+      this.setData({ cards });
+      wx.vibrateShort({ type: 'light' });
+    }
+  },
+
+  /**
+   * 点击金句：弹出操作菜单（插入/复制/删除）
+   */
+  onQuoteTap(e) {
+    const { text, cardId, index } = e.currentTarget.dataset;
+    wx.showActionSheet({
+      itemList: ['插入到正文末尾', '复制到剪贴板', '删除该金句'],
+      itemColor: '#000000',
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 插入到正文
+          const cards = this.data.cards;
+          const card = cards.find(c => c.id === cardId);
+          if (card) {
+            const separator = card.content ? '\n\n' : '';
+            card.content += separator + text;
+            this.setData({ cards });
+            this.calculateTotalDuration();
+            this.saveCards();
+            wx.showToast({ title: '已插入', icon: 'none' });
+          }
+        } else if (res.tapIndex === 1) {
+          // 复制
+          wx.setClipboardData({
+            data: text,
+            success: () => {
+              wx.showToast({ title: '已复制', icon: 'success' });
+            }
+          });
+        } else if (res.tapIndex === 2) {
+          // 删除
+          const cards = this.data.cards;
+          const card = cards.find(c => c.id === cardId);
+          if (card && card.quotes) {
+            card.quotes.splice(index, 1);
+            this.setData({ cards });
+            this.saveCards();
+            wx.showToast({ title: '已删除', icon: 'none' });
+          }
+        }
+      }
+    });
+  },
+
   async onConsultMentor() {
-    wx.showLoading({ title: '导师正在阅卷...' });
+    if (this.data.isMentorThinking) {
+      wx.showToast({ title: '导师正在阅卷中...', icon: 'none' });
+      return;
+    }
+
+    this.setData({ 
+      isMentorThinking: true,
+      mentorThinkingText: '导师正在阅读您的稿件...' 
+    });
+
+    // 震动提醒开始后台任务
+    wx.vibrateShort({ type: 'medium' });
+    wx.showToast({ title: '已开启后台阅卷', icon: 'none' });
+
     try {
-      const result = await AiService.analyzeStructure(this.data.cards, this.data.project.title);
-      wx.hideLoading();
+      const result = await AiService.analyzeStructure(this.data.cards, this.data.project.title, (text) => {
+        // 在后台静默更新文本，不阻塞用户
+        this.setData({ mentorThinkingText: text });
+      });
       
       // 精准解析：匹配 "建议X：标题" 和 "内容：指导"
-      const suggestions = [];
       const sections = result.split(/建议\d：|建议\d:/).filter(s => s.trim().length > 10);
       
       const newItems = sections.map((section, i) => {
@@ -322,23 +481,26 @@ Page({
       });
 
       const projectData = Storage.getProject(this.data.project.id);
-      projectData.mentorSuggestions = [...(projectData.mentorSuggestions || []), ...newItems];
+      const allSuggestions = [...(projectData.mentorSuggestions || []), ...newItems];
+      projectData.mentorSuggestions = allSuggestions;
       Storage.saveProjectData(this.data.project.id, projectData);
       
+      const pendingSuggestions = allSuggestions.filter(s => s.status === 'pending');
       this.setData({ 
-        pendingSuggestionCount: projectData.mentorSuggestions.filter(s => s.status === 'pending').length 
+        isMentorThinking: false,
+        showMentorThinkingMask: false, // 阅卷完成自动关闭详情窗
+        mentorThinkingText: '',
+        mentorSuggestions: pendingSuggestions,
+        pendingSuggestionCount: pendingSuggestions.length,
+        currentSuggestionIndex: 0, 
+        showFloatingMentor: true   // 任务完成，自动展开悬浮窗提醒用户
       });
 
-      wx.showModal({
-        title: '咨询完成',
-        content: `导师为你准备了 ${newItems.length} 条新建议，已放入导师空间。`,
-        confirmText: '去看看',
-        success: (res) => {
-          if (res.confirm) this.onGoToMentor();
-        }
-      });
+      wx.vibrateLong(); // 强震动提醒完成
+      wx.showToast({ title: `导师已完成阅卷，新增 ${newItems.length} 条建议`, icon: 'none', duration: 3000 });
+
     } catch (err) {
-      wx.hideLoading();
+      this.setData({ isMentorThinking: false, mentorThinkingText: '' });
       wx.showToast({ title: '咨询失败，请重试', icon: 'none' });
     }
   },
@@ -359,6 +521,85 @@ Page({
     wx.reLaunch({
       url: '/pages/history/history'
     });
+  },
+
+  /**
+   * 切换悬浮导师卡片的显示/隐藏
+   */
+  toggleFloatingMentor() {
+    this.setData({
+      showFloatingMentor: !this.data.showFloatingMentor
+    });
+  },
+
+  /**
+   * 切换到上一条建议
+   */
+  prevSuggestion() {
+    if (this.data.currentSuggestionIndex > 0) {
+      this.setData({
+        currentSuggestionIndex: this.data.currentSuggestionIndex - 1
+      });
+    }
+  },
+
+  /**
+   * 切换到下一条建议
+   */
+  nextSuggestion() {
+    if (this.data.currentSuggestionIndex < this.data.mentorSuggestions.length - 1) {
+      this.setData({
+        currentSuggestionIndex: this.data.currentSuggestionIndex + 1
+      });
+    }
+  },
+
+  /**
+   * 标记当前建议为已完成
+   */
+  async completeSuggestion() {
+    const { mentorSuggestions, currentSuggestionIndex, project } = this.data;
+    const suggestion = mentorSuggestions[currentSuggestionIndex];
+    if (!suggestion) return;
+
+    // 更新本地存储中的状态
+    const projectData = Storage.getProject(project.id);
+    if (projectData && projectData.mentorSuggestions) {
+      const idx = projectData.mentorSuggestions.findIndex(s => s.id === suggestion.id);
+      if (idx !== -1) {
+        projectData.mentorSuggestions[idx].status = 'completed';
+        Storage.saveProjectData(project.id, projectData);
+      }
+    }
+
+    // 更新当前页面的状态
+    const newSuggestions = mentorSuggestions.filter(s => s.id !== suggestion.id);
+    let newIndex = currentSuggestionIndex;
+    if (newIndex >= newSuggestions.length) {
+      newIndex = Math.max(0, newSuggestions.length - 1);
+    }
+
+    this.setData({
+      mentorSuggestions: newSuggestions,
+      pendingSuggestionCount: newSuggestions.length,
+      currentSuggestionIndex: newIndex
+    });
+
+    wx.showToast({ title: '建议已完成', icon: 'success' });
+  },
+
+  /**
+   * 显示后台阅卷详情
+   */
+  onShowMentorThinking() {
+    this.setData({ showMentorThinkingMask: true });
+  },
+
+  /**
+   * 隐藏后台阅卷详情
+   */
+  onHideMentorThinking() {
+    this.setData({ showMentorThinkingMask: false });
   },
 
   preventBubble() {

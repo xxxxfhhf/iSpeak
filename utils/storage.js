@@ -68,7 +68,7 @@ const Storage = {
           type: 'opening',
           title: '开场钩子',
           content: '',
-          durationSec: 20,
+          durationSec: 0,
           quotes: []
         }
       ]

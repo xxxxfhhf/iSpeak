@@ -23,8 +23,8 @@ Page({
     if (projectData) {
       const cards = projectData.cards.map(card => {
         const wordCount = (card.content || '').length;
-        // 简单分析：假设 20s 对应约 60-70 字 (200字/min)
-        const idealWords = Math.floor((card.durationSec || 20) * 3.3);
+        // 简单分析：根据卡片时长计算理想字数 (150字/min = 2.5字/s)
+        const idealWords = Math.floor((card.durationSec || 0) * 2.5);
         let durationStatus = 'normal';
         if (wordCount > 0) {
           if (wordCount < idealWords * 0.5) durationStatus = 'too-short';
@@ -82,31 +82,21 @@ Page({
       md += `\n`;
     });
 
-    // 附录：AI 导师优化建议
-    const projectData = Storage.getProject(this.data.project.id);
-    if (projectData && projectData.mentorSuggestions && projectData.mentorSuggestions.length > 0) {
+    // 附录：AI 导师优化建议清单
+    const { mentorSuggestions } = this.data;
+    if (mentorSuggestions && mentorSuggestions.length > 0) {
       md += `---\n\n`;
-      md += `# 【附录：AI 导师优化记录】\n\n`;
-      md += `> 以下记录了 AI 导师为您提供的精进建议，帮助您回顾打磨过程。\n\n`;
+      md += `# 【附录：AI 导师优化建议清单】\n\n`;
+      md += `> 以下是 AI 导师为您提供的精进建议，包含建议详情及完成状态。\n\n`;
 
-      const pending = projectData.mentorSuggestions.filter(s => s.status === 'pending');
-      const completed = projectData.mentorSuggestions.filter(s => s.status === 'completed');
+      mentorSuggestions.forEach((s, i) => {
+        const statusIcon = s.status === 'completed' ? '✅' : '🔴';
+        const titleText = s.status === 'completed' ? `~~建议${i + 1}：${s.title}~~` : `建议${i + 1}：${s.title}`;
+        const contentText = s.status === 'completed' ? `~~${s.text}~~` : s.text;
 
-      if (pending.length > 0) {
-        md += `### 🔴 待处理建议\n\n`;
-        pending.forEach(s => {
-          md += `* **[导师建议]** ${s.text}\n`;
-        });
-        md += `\n`;
-      }
-
-      if (completed.length > 0) {
-        md += `### 🟢 已完成建议\n\n`;
-        completed.forEach(s => {
-          md += `* ~~**[导师建议]** ${s.text}~~\n`;
-        });
-        md += `\n`;
-      }
+        md += `### ${statusIcon} ${titleText}\n\n`;
+        md += `${contentText}\n\n`;
+      });
     }
 
     wx.setClipboardData({

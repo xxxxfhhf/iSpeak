@@ -54,6 +54,46 @@
   padding-bottom: 10rpx;
 }
 
+.md-hr {
+  height: 2rpx;
+  background-color: #eee;
+  margin: 60rpx 0;
+}
+
+.mentor-suggestions-preview {
+  margin-top: 40rpx;
+  padding-bottom: 40rpx;
+}
+
+.suggestion-preview-item {
+  margin-bottom: 40rpx;
+  padding: 20rpx;
+  background-color: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+.suggestion-preview-item.completed {
+  opacity: 0.6;
+}
+
+.md-h3 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  font-weight: normal;
+  margin-left: 10rpx;
+}
+
+.suggestion-preview-item.completed .md-h3,
+.suggestion-preview-item.completed .md-p {
+  text-decoration: line-through;
+}
+
 .md-info {
   font-size: 24rpx;
   color: #999;

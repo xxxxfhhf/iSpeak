@@ -26,11 +26,21 @@
           </view>
         </view>
       </block>
+
+      <!-- AI 导师精进建议清单 -->
+      <view class="mentor-suggestions-preview" wx:if="{{mentorSuggestions.length > 0}}">
+        <view class="md-hr"></view>
+        <view class="md-h1">📜 AI 导师精进建议清单</view>
+        <view class="suggestion-preview-item {{item.status}}" wx:for="{{mentorSuggestions}}" wx:key="id">
+          <view class="md-h3">建议{{index + 1}}：{{item.title}} <text class="status-tag">[{{item.status === 'completed' ? '已完成' : '待处理'}}]</text></view>
+          <view class="md-p">{{item.text}}</view>
+        </view>
+      </view>
     </view>
   </scroll-view>
 
   <view class="analysis-footer">
-    <view class="analysis-title">时长分析 (语速: 200字/min)</view>
+    <view class="analysis-title">时长分析 (语速: 150字/min)</view>
     <view class="chart">
       <view 
         class="chart-bar" 

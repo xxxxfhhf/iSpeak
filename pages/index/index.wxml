@@ -65,12 +65,14 @@
                 </view>
                 
                 <view class="card-actions" wx:if="{{activeCardId === item.id}}">
-                  <view class="action-btn" wx:if="{{item.isAi}}" catchtap="onConfirmAi" data-id="{{item.id}}">✔️确认</view>
                   <view class="action-btn" catchtap="onDeleteCard" data-id="{{item.id}}">🗑️</view>
                   <view class="action-btn" catchtap="onAiAction" data-id="{{item.id}}">✨AI</view>
                   <view class="action-btn" catchtap="onAddAfter" data-id="{{item.id}}">➕追加</view>
                 </view>
-                <view class="card-duration-tag" wx:else>{{item.durationSec}}s</view>
+                <view class="card-duration-tag" wx:else>
+                  <text class="word-count-tag">{{item.wordCount || 0}}字 / </text>
+                  <text>{{item.durationSec}}s</text>
+                </view>
               </view>
               
               <view class="card-body">
@@ -83,11 +85,29 @@
                   data-id="{{item.id}}"
                   maxlength="-1"
                 />
+
+                <!-- AI 生成预览区 -->
+                <view class="ai-preview-box" wx:if="{{item.tempAiContent}}">
+                  <view class="ai-preview-header">
+                    <text class="ai-preview-tag">✨ AI 优化方案</text>
+                  </view>
+                  <view class="ai-preview-content">{{item.tempAiContent}}</view>
+                  <view class="ai-preview-actions">
+                    <view class="ai-opt-btn replace" catchtap="onAiAcceptReplace" data-id="{{item.id}}">✅ 替换原文</view>
+                    <view class="ai-opt-btn insert" catchtap="onAiAcceptInsert" data-id="{{item.id}}">➕ 插入后行</view>
+                    <view class="ai-opt-btn discard" catchtap="onAiDiscard" data-id="{{item.id}}">❌ 放弃</view>
+                  </view>
+                </view>
                 
                 <view class="quotes-list" wx:if="{{item.quotes.length > 0}}">
-                  <view class="quote-item" wx:for="{{item.quotes}}" wx:for-item="quote" wx:key="index">
-                    <text class="quote-lock">{{quote.pinned ? '🔒' : '🔓'}}</text>
-                    <text class="quote-text">{{quote.text}}</text>
+                  <view class="quote-item" wx:for="{{item.quotes}}" wx:for-item="quote" wx:key="index" catchtap="onQuoteTap" data-text="{{quote.text}}" data-card-id="{{item.id}}" data-index="{{index}}">
+                    <view class="quote-header">
+                      <text class="quote-type-tag {{quote.type}}">{{quote.type === 'ref' ? '引用' : 'AI原创'}}</text>
+                      <text class="quote-source" wx:if="{{quote.source}}">来自：{{quote.source}}</text>
+                    </view>
+                    <view class="quote-body">
+                      <text class="quote-text">{{quote.text}}</text>
+                    </view>
                   </view>
                 </view>
               </view>
@@ -116,11 +136,11 @@
     </view>
     <view class="footer-btn" bindtap="onConsultMentor">
       <view class="footer-icon">✨</view>
-      <text>AI导师优化</text>
+      <text>AI建议</text>
     </view>
     <view class="footer-btn" bindtap="onGoToMentor">
       <view class="footer-icon">🎓</view>
-      <text>AI建议空间</text>
+      <text>建议空间</text>
       <view class="badge-dot" wx:if="{{pendingSuggestionCount > 0}}"></view>
     </view>
     <view class="footer-btn" bindtap="onGoToPreview">
@@ -138,6 +158,53 @@
       <view class="ai-menu-item" bindtap="doAiAction" data-action="vivid">更有画面感</view>
       <view class="ai-menu-item" bindtap="doAiAction" data-action="brief">精简</view>
       <view class="ai-menu-item" bindtap="doAiAction" data-action="quote">生成金句</view>
+    </view>
+  </view>
+
+  <!-- 后台任务状态条 -->
+  <view class="background-task-bar" wx:if="{{isMentorThinking}}" bindtap="onShowMentorThinking">
+    <view class="task-loading-icon">🎓</view>
+    <text class="task-text">AI 导师正在阅卷中...</text>
+    <view class="task-progress-dot"></view>
+  </view>
+
+  <!-- AI 导师阅卷流式详情弹窗 (可按需查看) -->
+  <view class="mentor-thinking-mask" wx:if="{{showMentorThinkingMask}}">
+    <view class="mentor-thinking-card">
+      <view class="mentor-header">
+        <text>🎓 AI 导师阅卷详情</text>
+        <view class="close-mask" bindtap="onHideMentorThinking">×</view>
+      </view>
+      <scroll-view scroll-y class="mentor-scroll">
+        <text class="mentor-text">{{mentorThinkingText || '正在收集建议...'}}</text>
+      </scroll-view>
+      <view class="mentor-tip">您可以随时关闭此窗口，阅卷将在后台继续</view>
+    </view>
+  </view>
+
+  <!-- 悬浮导师建议卡片 -->
+  <view class="floating-mentor-container {{showFloatingMentor ? 'expanded' : 'collapsed'}}" wx:if="{{mentorSuggestions.length > 0}}">
+    <view class="floating-mentor-toggle" bindtap="toggleFloatingMentor">
+      <text class="mentor-icon">🎓</text>
+      <text class="mentor-count" wx:if="{{!showFloatingMentor}}">{{pendingSuggestionCount}}</text>
+      <text class="toggle-text">{{showFloatingMentor ? '折叠建议' : '查看建议'}}</text>
+    </view>
+    
+    <view class="floating-mentor-content" wx:if="{{showFloatingMentor}}">
+      <view class="suggestion-header">
+        <text class="suggestion-index">建议 {{currentSuggestionIndex + 1}}/{{mentorSuggestions.length}}</text>
+        <text class="suggestion-title">{{mentorSuggestions[currentSuggestionIndex].title}}</text>
+      </view>
+      <scroll-view scroll-y class="suggestion-scroll">
+        <text class="suggestion-text">{{mentorSuggestions[currentSuggestionIndex].text}}</text>
+      </scroll-view>
+      <view class="suggestion-footer">
+        <view class="nav-btns">
+          <view class="nav-btn {{currentSuggestionIndex === 0 ? 'disabled' : ''}}" bindtap="prevSuggestion">上一条</view>
+          <view class="nav-btn {{currentSuggestionIndex === mentorSuggestions.length - 1 ? 'disabled' : ''}}" bindtap="nextSuggestion">下一条</view>
+        </view>
+        <view class="complete-btn" bindtap="completeSuggestion">已完成</view>
+      </view>
     </view>
   </view>
 </view>
