@@ -1,0 +1,81 @@
+<!-- pages/cert/home/home.wxml — 导师认证 + 导师权益 -->
+<template name="richBlock">
+  <block wx:for="{{blocks}}" wx:key="id">
+    <view wx:if="{{item.type === 'label'}}" class="block-label">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'bullet'}}" class="block-bullet">{{item.text}}</view>
+    <view wx:else class="block-paragraph">{{item.text}}</view>
+  </block>
+</template>
+
+<scroll-view scroll-y class="page-scroll">
+  <view class="container">
+    <view class="hero">
+      <text class="hero-icon">🎓</text>
+      <text class="hero-title">导师认证中心</text>
+      <text class="hero-desc">完成 L3 必修路径后，可申请成为俱乐部导师</text>
+    </view>
+
+    <!-- 导师简介 -->
+    <view class="info-card">
+      <text class="info-title">什么是俱乐部导师</text>
+      <view class="rich-content">
+        <template is="richBlock" data="{{blocks: introBlocks}}" />
+      </view>
+    </view>
+
+    <!-- 导师权益表 -->
+    <view class="info-card">
+      <view class="card-head" bindtap="onToggleBenefits">
+        <text class="info-title">导师权益</text>
+        <text class="toggle">{{showBenefits ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <block wx:if="{{showBenefits}}">
+        <text class="info-hint">会员 vs 导师权益对照</text>
+        <view class="benefit-table">
+          <view class="benefit-row head">
+            <view class="col-item">项目</view>
+            <view class="col-member">会员</view>
+            <view class="col-mentor">导师</view>
+          </view>
+          <view class="benefit-row" wx:for="{{mentorBenefits}}" wx:key="index">
+            <view class="col-item">{{item.item}}</view>
+            <view class="col-member">{{item.member}}</view>
+            <view class="col-mentor highlight">{{item.mentor}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 导师职责（可折叠） -->
+    <view class="info-card">
+      <view class="card-head" bindtap="onToggleDuties">
+        <text class="info-title">导师职责</text>
+        <text class="toggle">{{showDuties ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <view class="rich-content" wx:if="{{showDuties}}">
+        <template is="richBlock" data="{{blocks: dutyBlocks}}" />
+      </view>
+    </view>
+
+    <!-- 认证流程 -->
+    <view class="info-card flow-card">
+      <text class="info-title">认证流程</text>
+      <text class="info-step">1. 完成 L3V1~L3V4 全部必修路径</text>
+      <text class="info-step">2. 选修 L3X1，按 SMART 原则规划并开展认证工作坊</text>
+      <text class="info-step">3. 通过导师现场评审，提交认证申请</text>
+      <text class="info-step">4. 领取导师证书，开始带教新会员</text>
+    </view>
+
+    <button class="btn primary" bindtap="onGoChecklist">查看认证清单</button>
+    <button class="btn" bindtap="onGoWorkshop">工作坊规划</button>
+
+    <view class="oa-card" bindtap="onFollowOfficialAccount">
+      <text class="oa-icon">📢</text>
+      <view class="oa-info">
+        <text class="oa-title">关注公众号</text>
+        <text class="oa-sub">{{clubFollowHint}}</text>
+      </view>
+      <text class="oa-arrow">›</text>
+    </view>
+  </view>
+</scroll-view>

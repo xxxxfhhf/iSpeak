@@ -1,0 +1,484 @@
+/* pages/learn/home/home.wxss */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.top-tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+  flex-shrink: 0;
+}
+
+.top-tab {
+  flex: 1;
+  text-align: center;
+  padding: 26rpx 0;
+  font-size: 30rpx;
+  color: #999;
+  border-bottom: 4rpx solid transparent;
+}
+
+.top-tab.active {
+  color: #007aff;
+  font-weight: bold;
+  border-bottom-color: #007aff;
+}
+
+.page-scroll {
+  flex: 1;
+  height: 0;
+}
+
+.container {
+  padding: 30rpx;
+  box-sizing: border-box;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+}
+
+.header {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.progress-label {
+  width: 120rpx;
+}
+
+.progress-item progress {
+  flex: 1;
+  margin: 0 20rpx;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progress-value {
+  width: 60rpx;
+  text-align: right;
+}
+
+/* 手册导读快捷入口（路径学习 Tab 内一行卡片） */
+.guide-entry {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.guide-entry-icon { font-size: 40rpx; margin-right: 20rpx; }
+
+.guide-entry-text { flex: 1; }
+
+.guide-entry-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.guide-entry-sub {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.guide-entry-arrow {
+  font-size: 36rpx;
+  color: #ccc;
+}
+
+.guide-header {
+  margin-bottom: 20rpx;
+}
+
+.guide-header-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.guide-header-sub {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.stage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.stage-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  position: relative;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.stage-card.locked {
+  opacity: 0.8;
+}
+
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.stage-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.stage-status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.stage-status.completed {
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.stage-status.in_progress {
+  background: #e3f2fd;
+  color: #2196f3;
+}
+
+.stage-status.locked {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.stage-content {
+  display: flex;
+  gap: 40rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.stat-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.lock-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  font-size: 24rpx;
+  gap: 10rpx;
+}
+
+.bottom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.action-btn {
+  width: 100%;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  background: #fff;
+  color: #333;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-btn.primary {
+  background: #007aff;
+  color: #fff;
+}
+
+.action-btn.outline {
+  border: 2rpx solid #007aff;
+  color: #007aff;
+}
+
+/* 手册前言/俱乐部介绍卡片 */
+.intro-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.intro-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.intro-head-text { flex: 1; }
+
+.sub-section {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx dashed #e8e8e8;
+}
+
+.sub-section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #007aff;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.block-subheading {
+  font-size: 29rpx;
+  font-weight: bold;
+  color: #ff9500;
+  line-height: 1.6;
+  margin: 20rpx 0 12rpx;
+  padding: 8rpx 16rpx;
+  background: #fff8f0;
+  border-radius: 8rpx;
+}
+
+.block-example {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.9;
+  background: #faf8f5;
+  border: 1rpx solid #f0e6d8;
+  border-left: 6rpx solid #ff9500;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  white-space: pre-wrap;
+}
+
+.block-example-title {
+  display: inline-block;
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #fff;
+  background: #ff9500;
+  padding: 4rpx 16rpx;
+  border-radius: 6rpx;
+  margin: 24rpx 0 12rpx;
+}
+
+.intro-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.intro-sub {
+  font-size: 22rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.intro-head .intro-title { margin-bottom: 4rpx; }
+.intro-head .intro-sub { margin-bottom: 0; }
+
+.toggle {
+  font-size: 22rpx;
+  color: #007aff;
+}
+
+.rich-content { margin-top: 8rpx; }
+
+/* 与课程页共用排版类名 */
+.block-paragraph {
+  display: block;
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.85;
+  margin-bottom: 20rpx;
+  text-align: justify;
+}
+
+.block-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #5856d6;
+  line-height: 1.7;
+  margin: 16rpx 0 12rpx;
+}
+
+.block-chapter {
+  display: block;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #007aff;
+  line-height: 1.6;
+  margin: 24rpx 0 12rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #007aff;
+}
+
+.block-list-item {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.85;
+  margin-bottom: 12rpx;
+  padding-left: 20rpx;
+  border-left: 4rpx solid #34c759;
+}
+
+.block-bullet {
+  display: block;
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.85;
+  margin-bottom: 10rpx;
+  padding-left: 16rpx;
+}
+
+.member-card {
+  border-left: 6rpx solid #ff9500;
+}
+
+/* 会员权益表 */
+.benefit-table {
+  border: 1rpx solid #eee;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.benefit-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 12rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  font-size: 24rpx;
+}
+
+.benefit-row.head {
+  background: #f5f7fa;
+  font-weight: bold;
+  color: #666;
+}
+
+.benefit-row:last-child { border-bottom: none; }
+
+.col-item { flex: 2; color: #333; }
+.col-guest, .col-member { flex: 1; text-align: center; }
+.col-guest.yes, .col-member.yes { color: #34c759; font-weight: bold; }
+.col-guest.no { color: #ccc; }
+.col-guest.pay { color: #ff9500; font-size: 22rpx; }
+.col-member.free { color: #007aff; font-weight: bold; }
+
+.section-divider {
+  text-align: center;
+  margin: 32rpx 0 24rpx;
+  border-top: 1rpx solid #ddd;
+  padding-top: 24rpx;
+}
+
+.thanks-card { margin-bottom: 24rpx; }
+
+.divider-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 公众号关注入口 */
+.oa-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  margin: 24rpx 0 40rpx;
+  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+  border: 1rpx solid #ffe0b2;
+  border-radius: 16rpx;
+}
+
+.oa-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.oa-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.oa-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.oa-sub {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 6rpx;
+}
+
+.oa-arrow {
+  font-size: 36rpx;
+  color: #ccc;
+}

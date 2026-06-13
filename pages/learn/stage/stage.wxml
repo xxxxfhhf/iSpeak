@@ -1,0 +1,101 @@
+<!-- pages/learn/stage/stage.wxml — 路径/课程 + 本阶段特别感谢 -->
+<template name="richBlock">
+  <block wx:for="{{blocks}}" wx:key="id">
+    <view wx:if="{{item.type === 'label'}}" class="block-label">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'paragraph'}}" class="block-paragraph">{{item.text}}</view>
+    <view wx:else class="block-paragraph">{{item.text}}</view>
+  </block>
+</template>
+
+<view class="container">
+  <view class="stage-header">
+    <text class="stage-title">{{stage.title}}</text>
+    <text class="stage-desc">{{stage.desc}}</text>
+    <view class="unlock-hint" wx:if="{{!isUnlocked}}">
+      <text>{{stage.unlockHint}} · 可预览，不可提交</text>
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{activeTab === 'path' ? 'active' : ''}}" bindtap="onTabChange" data-tab="path">路径</view>
+    <view class="tab {{activeTab === 'course' ? 'active' : ''}}" bindtap="onTabChange" data-tab="course">全部课程</view>
+  </view>
+
+  <scroll-view scroll-y class="list">
+    <block wx:if="{{activeTab === 'path'}}">
+      <view class="group-label">必修路径</view>
+      <view class="path-card {{item.completed ? 'done' : ''}}" wx:for="{{requiredPaths}}" wx:key="id" bindtap="onPathTap" data-id="{{item.id}}">
+        <view class="item-row">
+          <text class="item-code">{{item.code}}</text>
+          <text class="type-tag req">必修</text>
+        </view>
+        <text class="item-title">{{item.title}}</text>
+        <text class="item-sub">{{item.itemCount}} 个项目 · {{item.courseCount}} 门课程 · {{item.taskCount}} 项演练</text>
+        <text class="done-label" wx:if="{{item.completed}}">✓ 路径已完成</text>
+      </view>
+      <view class="empty-hint" wx:if="{{!requiredPaths.length}}">暂无必修路径</view>
+
+      <view class="group-label">选修路径</view>
+      <view class="path-card elective {{item.completed ? 'done' : ''}}" wx:for="{{electivePaths}}" wx:key="id" bindtap="onPathTap" data-id="{{item.id}}">
+        <view class="item-row">
+          <text class="item-code">{{item.code}}</text>
+          <text class="type-tag opt">选修</text>
+        </view>
+        <text class="item-title">{{item.title}}</text>
+        <text class="item-sub">{{item.itemCount}} 个项目 · {{item.courseCount}} 门课程 · {{item.taskCount}} 项演练</text>
+        <text class="done-label" wx:if="{{item.completed}}">✓ 路径已完成</text>
+      </view>
+      <view class="empty-hint" wx:if="{{!electivePaths.length}}">暂无选修路径</view>
+    </block>
+
+    <block wx:if="{{activeTab === 'course'}}">
+      <view class="group-label">必修课程</view>
+      <view class="list-item" wx:for="{{requiredCourses}}" wx:key="id" bindtap="onCourseTap" data-id="{{item.id}}">
+        <view class="item-row">
+          <text class="item-code">{{item.pathCode}}</text>
+          <text class="type-tag req">必修</text>
+        </view>
+        <text class="item-title">{{item.title}}</text>
+        <text class="item-sub">{{item.learnContent}}</text>
+      </view>
+      <view class="empty-hint" wx:if="{{!requiredCourses.length}}">暂无必修课程</view>
+
+      <view class="group-label">选修课程</view>
+      <view class="list-item elective" wx:for="{{electiveCourses}}" wx:key="id" bindtap="onCourseTap" data-id="{{item.id}}">
+        <view class="item-row">
+          <text class="item-code">{{item.pathCode}}</text>
+          <text class="type-tag opt">选修</text>
+        </view>
+        <text class="item-title">{{item.title}}</text>
+        <text class="item-sub">{{item.learnContent}}</text>
+      </view>
+      <view class="empty-hint" wx:if="{{!electiveCourses.length}}">暂无选修课程</view>
+    </block>
+
+    <!-- 本阶段结语 -->
+    <view class="epilogue-section" wx:if="{{epilogueBlocks.length}}">
+      <view class="section-head-row" bindtap="onToggleEpilogue">
+        <text class="section-head-title">— 结语 —</text>
+        <text class="toggle">{{showEpilogue ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <view wx:if="{{showEpilogue}}">
+        <template is="richBlock" data="{{blocks: epilogueBlocks}}" />
+      </view>
+    </view>
+
+    <!-- 特别感谢 -->
+    <view class="thanks-section" wx:if="{{thanksBlocks.length}}">
+      <view class="section-head-row" bindtap="onToggleThanks">
+        <text class="section-head-title">— 特别感谢 —</text>
+        <text class="toggle">{{showThanks ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <view wx:if="{{showThanks}}">
+        <template is="richBlock" data="{{blocks: thanksBlocks}}" />
+      </view>
+    </view>
+
+    <view class="oa-inline" bindtap="onFollowOfficialAccount">
+      <text>📢 关注公众号「i演讲」获取活动资讯 ›</text>
+    </view>
+  </scroll-view>
+</view>

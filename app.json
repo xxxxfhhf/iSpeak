@@ -6,7 +6,20 @@
     "pages/mentor/mentor",
     "pages/wizard/wizard",
     "pages/library/library",
-    "pages/templates/templates"
+    "pages/templates/templates",
+    "pages/learn/home/home",
+    "pages/learn/stage/stage",
+    "pages/learn/course/course",
+    "pages/learn/quiz/quiz",
+    "pages/learn/path/path",
+    "pages/learn/submit/submit",
+    "pages/learn/search/search",
+    "pages/learn/webview/webview",
+    "pages/cert/home/home",
+    "pages/cert/checklist/checklist",
+    "pages/cert/workshop/workshop",
+    "pages/cert/result/result",
+    "pages/club/follow/follow"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -64,7 +64,7 @@ const Storage = {
     const newProject = {
       id,
       title,
-      type: 'toastmasters_story', // 默认头马故事
+      type: 'common', // 改为通用类型，移除 toastmasters_story
       createdAt: Date.now(),
       updatedAt: Date.now()
     };

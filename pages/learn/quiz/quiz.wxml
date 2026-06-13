@@ -1,0 +1,33 @@
+<view class="container">
+  <block wx:if="{{!showResult}}">
+    <view class="quiz-header">
+      <text class="quiz-progress">第 {{currentIndex + 1}} / {{total}} 题</text>
+      <text class="quiz-title">{{courseTitle}}</text>
+    </view>
+    <view class="question-card">
+      <text class="question">{{currentQuestion.q}}</text>
+      <view class="options">
+        <view wx:for="{{currentQuestion.options}}" wx:key="*this" class="option {{selectedIndex === index ? 'selected' : ''}}" bindtap="onSelectOption" data-index="{{index}}">
+          <text class="option-label">{{['A','B','C','D'][index]}}</text>
+          <text class="option-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+    <button class="btn primary" bindtap="onNext" disabled="{{selectedIndex === -1}}">{{currentIndex < total - 1 ? '下一题' : '交卷'}}</button>
+  </block>
+  <block wx:else>
+    <view class="result-card">
+      <text class="result-score">{{score}}%</text>
+      <text class="result-text">{{passed ? '恭喜通过（≥80%）' : '未达标，请重试'}}</text>
+      <view wx:if="{{wrongList.length > 0}}">
+        <text class="wrong-title">错题回看</text>
+        <view class="wrong-item" wx:for="{{wrongList}}" wx:key="index">
+          <text>{{item.q}}</text>
+          <text class="wrong-a">正确答案：{{item.correctText}}</text>
+        </view>
+      </view>
+    </view>
+    <button class="btn primary" bindtap="onBackCourse">返回课程</button>
+    <button class="btn" wx:if="{{!passed}}" bindtap="onRetry">重新答题</button>
+  </block>
+</view>

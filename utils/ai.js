@@ -72,7 +72,7 @@ const SYSTEM_PROMPTS = {
 [引用] "金句内容" —— 出处
 [AI原创] "金句内容"`,
 
-  complete: '你是一位资深的演讲导师。请分析当前的演讲积木序列，并给出 3-5 条具有实操意义的精进建议。要求：\n1. 每个建议必须包含【标题】和【详细建议】。\n2. 涵盖结构完整性、情感起伏、节奏控制或金句质量。\n3. 输出格式严格按照：\n建议1：[标题]\n内容：[详细指导]\n建议2：[标题]\n内容：[详细指导]',
+  complete: '你是一位资深的演讲导师。请分析当前演讲内容，并给出 3-5 条具有实操意义的精进建议。要求：\n1. 每个建议必须包含【标题】和【详细建议】。\n2. 涵盖结构完整性、情感起伏、节奏控制或金句质量。\n3. 输出格式严格按照：\n建议1：[标题]\n内容：[详细指导]\n建议2：[标题]\n内容：[详细指导]',
 
   recommend: `你是一位敏锐的演讲架构师。请根据用户提供的【演讲目标】、【听众对象】和【灵感碎片】，从以下结构中推荐 1-2 个最合适的模版。
 可选模版 ID：
@@ -219,7 +219,7 @@ const AiService = {
 【环节类型】${card.typeLabel}
 【环节意图】${card.intent}
 【当前环节标题】${card.title}
-【当前演讲稿段落内容】
+【当前演讲内容】
 ${card.content || '(内容为空，请给出该环节的案例或模版)'}`;
     
     // 调用底层 AI 服务
@@ -262,7 +262,7 @@ ${card.content || '(内容为空，请给出该环节的案例或模版)'}`;
   async analyzeStructure(cards, projectTitle, onTextCallback) {
     const prompt = SYSTEM_PROMPTS.complete;
     const structure = cards.map((c, i) => `${i + 1}. [${c.typeLabel}] ${c.title}`).join('\n');
-    const content = `演讲标题：${projectTitle}\n当前结构：\n${structure}`;
+    const content = `演讲标题：${projectTitle}\n当前演讲内容：\n${structure}`;
     return this.callDeepSeek(prompt, content, onTextCallback);
   },
 

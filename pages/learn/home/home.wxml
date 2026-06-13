@@ -1,0 +1,174 @@
+<!-- pages/learn/home/home.wxml — 双 Tab：路径学习 / 手册导读 -->
+<!-- 富文本块模板（须放在页面根部） -->
+<template name="richBlock">
+  <block wx:for="{{blocks}}" wx:key="id">
+    <view wx:if="{{item.type === 'label'}}" class="block-label">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'chapter'}}" class="block-chapter">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'subheading'}}" class="block-subheading">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'list-item'}}" class="block-list-item">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'bullet'}}" class="block-bullet">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'example'}}" class="block-example">{{item.text}}</view>
+    <view wx:elif="{{item.type === 'example-title'}}" class="block-example-title">{{item.text}}</view>
+    <view wx:else class="block-paragraph">{{item.text}}</view>
+  </block>
+</template>
+
+<view class="page">
+  <!-- 顶部 Tab：默认路径学习，不挡 L1/L2/L3 -->
+  <view class="top-tabs">
+    <view class="top-tab {{activeTab === 'learn' ? 'active' : ''}}" bindtap="onTabChange" data-tab="learn">路径学习</view>
+    <view class="top-tab {{activeTab === 'guide' ? 'active' : ''}}" bindtap="onTabChange" data-tab="guide">手册导读</view>
+  </view>
+
+  <scroll-view scroll-y class="page-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="container">
+
+      <!-- ========== Tab：路径学习 ========== -->
+      <block wx:if="{{activeTab === 'learn'}}">
+        <view class="header">
+          <text class="title">厦门演讲俱乐部 · 路径手册</text>
+          <view class="progress-section">
+            <view class="progress-item">
+              <text class="progress-label">课程进度</text>
+              <progress percent="{{courseProgress}}" stroke-width="6" color="#007aff" active />
+              <text class="progress-value">{{courseProgress}}%</text>
+            </view>
+            <view class="progress-item">
+              <text class="progress-label">路径进度</text>
+              <progress percent="{{pathProgress}}" stroke-width="6" color="#34c759" active />
+              <text class="progress-value">{{pathProgress}}%</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 快捷入口：不占空间，点击切到手册导读 Tab -->
+        <view class="guide-entry" bindtap="onGoGuide">
+          <text class="guide-entry-icon">📖</text>
+          <view class="guide-entry-text">
+            <text class="guide-entry-title">手册导读</text>
+            <text class="guide-entry-sub">前言 · 俱乐部介绍 · 会员指引</text>
+          </view>
+          <text class="guide-entry-arrow">›</text>
+        </view>
+
+        <view class="stage-list">
+          <block wx:for="{{stages}}" wx:key="id">
+            <view class="stage-card {{item.status === 'locked' ? 'locked' : ''}}" bindtap="onStageTap" data-id="{{item.id}}">
+              <view class="stage-header">
+                <text class="stage-title">{{item.name}}</text>
+                <text class="stage-status {{item.status}}">{{item.statusText}}</text>
+              </view>
+              <view class="stage-content">
+                <view class="stat-item">
+                  <text class="stat-label">必修路径</text>
+                  <text class="stat-value">{{item.pathCompleted}}/{{item.pathTotal}}</text>
+                </view>
+                <view class="stat-item">
+                  <text class="stat-label">课程完成</text>
+                  <text class="stat-value">{{item.courseCompleted}}/{{item.courseTotal}}</text>
+                </view>
+              </view>
+              <view class="lock-mask" wx:if="{{item.status === 'locked'}}">
+                <icon type="warn" size="24" color="#999" />
+                <text>上一阶段完成后解锁</text>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <view class="bottom-actions">
+          <button class="action-btn primary" bindtap="onContinueLearn">继续学习</button>
+          <button class="action-btn" bindtap="onSearch">搜索手册</button>
+          <button class="action-btn outline" bindtap="onGoToCert">进入导师认证</button>
+        </view>
+
+        <!-- 关注公众号 -->
+        <view class="oa-card" bindtap="onFollowOfficialAccount">
+          <text class="oa-icon">📢</text>
+          <view class="oa-info">
+            <text class="oa-title">关注公众号</text>
+            <text class="oa-sub">{{clubFollowHint}}</text>
+          </view>
+          <text class="oa-arrow">›</text>
+        </view>
+      </block>
+
+      <!-- ========== Tab：手册导读（独立栏，不影响路径学习） ========== -->
+      <block wx:if="{{activeTab === 'guide'}}">
+        <view class="guide-header">
+          <text class="guide-header-title">手册导读</text>
+          <text class="guide-header-sub">开启路径之前，建议新会员先阅读</text>
+        </view>
+
+        <!-- 手册前言（可折叠） -->
+        <view class="intro-card">
+          <view class="intro-head" bindtap="onTogglePreface">
+            <view class="intro-head-text">
+              <text class="intro-title">📖 手册前言</text>
+              <text class="intro-sub">手册使用 · 会员权益</text>
+            </view>
+            <text class="toggle">{{showPreface ? '收起 ▲' : '展开 ▼'}}</text>
+          </view>
+          <block wx:if="{{showPreface}}">
+            <view class="rich-content">
+              <template is="richBlock" data="{{blocks: prefaceBlocks}}" />
+            </view>
+            <view class="sub-section">
+              <text class="sub-section-title">会员权益表</text>
+              <view class="benefit-table">
+                <view class="benefit-row head">
+                  <view class="col-item">项目</view>
+                  <view class="col-guest">嘉宾</view>
+                  <view class="col-member">会员</view>
+                </view>
+                <view class="benefit-row" wx:for="{{memberBenefits}}" wx:key="index">
+                  <view class="col-item">{{item.item}}</view>
+                  <view class="col-guest {{item.guest === '√' ? 'yes' : item.guest === '付费' ? 'pay' : 'no'}}">{{item.guest}}</view>
+                  <view class="col-member {{item.member === '√' ? 'yes' : item.member === '免费' ? 'free' : 'no'}}">{{item.member}}</view>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <!-- 俱乐部介绍（可折叠） -->
+        <view class="intro-card">
+          <view class="intro-head" bindtap="onToggleClubIntro">
+            <view class="intro-head-text">
+              <text class="intro-title">🏛 俱乐部介绍</text>
+              <text class="intro-sub">简介 · 宗旨 · 使命 · 愿景 · 价值观</text>
+            </view>
+            <text class="toggle">{{showClubIntro ? '收起 ▲' : '展开 ▼'}}</text>
+          </view>
+          <view class="rich-content" wx:if="{{showClubIntro}}">
+            <template is="richBlock" data="{{blocks: clubBlocks}}" />
+          </view>
+        </view>
+
+        <!-- 新会员指引（可折叠） -->
+        <view class="intro-card member-card">
+          <view class="intro-head" bindtap="onToggleMemberTips">
+            <view class="intro-head-text">
+              <text class="intro-title">🎯 新会员指引</text>
+              <text class="intro-sub">成为会员后的三件事</text>
+            </view>
+            <text class="toggle">{{showMemberTips ? '收起 ▲' : '展开 ▼'}}</text>
+          </view>
+          <view class="rich-content" wx:if="{{showMemberTips}}">
+            <template is="richBlock" data="{{blocks: memberBlocks}}" />
+          </view>
+        </view>
+
+        <view class="oa-card" bindtap="onFollowOfficialAccount">
+          <text class="oa-icon">📢</text>
+          <view class="oa-info">
+            <text class="oa-title">关注公众号</text>
+            <text class="oa-sub">{{clubFollowHint}}</text>
+          </view>
+          <text class="oa-arrow">›</text>
+        </view>
+      </block>
+
+    </view>
+  </scroll-view>
+</view>

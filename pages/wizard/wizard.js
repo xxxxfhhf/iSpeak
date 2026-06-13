@@ -52,6 +52,37 @@ Page({
         hasContent: true
       });
     }
+
+    // 路径学习联动：预填模板、目标与步骤（优先 Storage，避免 URL 过长）
+    const courseInit = wx.getStorageSync('wizard_course_init');
+    if (options.fromCourse === '1' && courseInit) {
+      wx.removeStorageSync('wizard_course_init');
+      const tid = courseInit.templateId;
+      const patch = {
+        selectedTemplateId: tid,
+        recMap: { [tid]: true },
+        goal: courseInit.goal || '',
+        audience: courseInit.audience || ''
+      };
+      if (courseInit.autoStep === 3) patch.currentStep = 3;
+      else if (courseInit.autoStep === 2) patch.currentStep = 2;
+      this.setData(patch);
+    } else if (options.templateId) {
+      const tid = options.templateId;
+      const patch = {
+        selectedTemplateId: tid,
+        recMap: { [tid]: true }
+      };
+      if (options.autoStep === '3') patch.currentStep = 3;
+      else if (options.autoStep === '2') patch.currentStep = 2;
+      this.setData(patch);
+      if (options.goal) {
+        this.setData({ goal: decodeURIComponent(options.goal) });
+      }
+      if (options.audience) {
+        this.setData({ audience: decodeURIComponent(options.audience) });
+      }
+    }
   },
 
   // --- Step 1 Logic ---

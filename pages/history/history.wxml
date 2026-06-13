@@ -7,6 +7,9 @@
     <view class="nav-btn library-btn" bindtap="onGoToLibrary" title="我的素材库">
       📚
     </view>
+    <view class="nav-btn learn-btn" bindtap="onGoToLearning" title="路径学习">
+      🎯
+    </view>
     <view class="nav-btn new-btn-wrapper" catchtap="toggleNewMenu">
       <view class="new-btn">➕ 新建</view>
       <!-- 气泡菜单 -->
@@ -40,6 +43,35 @@
  
   <!-- 遮罩层，用于点击外部关闭菜单 -->
   <view class="mask" wx:if="{{showNewMenu}}" bindtap="closeNewMenu"></view>
+
+  <!-- 路径学习 / 导师认证 / 公众号入口 -->
+  <view class="learn-entry-bar">
+    <view class="learn-entry-card" bindtap="onGoToLearning">
+      <text class="entry-icon">🎯</text>
+      <view class="entry-info">
+        <text class="entry-title">路径学习</text>
+        <text class="entry-desc">课程 + 路径双轨演练</text>
+      </view>
+      <text class="entry-arrow">›</text>
+    </view>
+    <view class="learn-entry-card cert" bindtap="onGoToMentorCert">
+      <text class="entry-icon">🎓</text>
+      <view class="entry-info">
+        <text class="entry-title">导师认证</text>
+        <text class="entry-desc">认证进度与工作坊</text>
+      </view>
+      <text class="entry-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="oa-banner" bindtap="onFollowOfficialAccount">
+    <text class="oa-banner-icon">📢</text>
+    <view class="oa-banner-info">
+      <text class="oa-banner-title">关注公众号「i演讲」</text>
+      <text class="oa-banner-sub">活动通知 · 成长资讯 · 俱乐部动态</text>
+    </view>
+    <text class="oa-banner-arrow">›</text>
+  </view>
 
   <scroll-view scroll-y class="project-list"> 
     <block wx:for="{{filteredProjects}}" wx:key="id"> 

@@ -1,0 +1,10 @@
+<!-- pages/cert/result/result.wxml -->
+<view class="container">
+  <view class="result-card {{certified ? 'success' : ''}}">
+    <text class="icon">{{certified ? '🎓' : '📋'}}</text>
+    <text class="title">{{certified ? '导师认证已通过' : '认证进行中'}}</text>
+    <text class="desc" wx:if="{{certified}}">认证日期：{{certDate}}</text>
+    <text class="desc" wx:else>请完成认证清单全部步骤后领取证书</text>
+  </view>
+  <button class="btn" bindtap="onClaimCert" wx:if="{{!certified}}">领取导师证书</button>
+</view>

@@ -1,0 +1,23 @@
+<!-- pages/learn/search/search.wxml -->
+<view class="container">
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索课程正文、路径项目..." value="{{keyword}}" bindinput="onSearchInput" focus />
+  </view>
+  <scroll-view scroll-y class="results" wx:if="{{keyword}}">
+    <view class="group" wx:if="{{courseResults.length > 0}}">
+      <text class="group-title">课程 ({{courseResults.length}})</text>
+      <view class="result-item" wx:for="{{courseResults}}" wx:key="id" bindtap="onCourseTap" data-id="{{item.id}}">
+        <text class="result-title">{{item.title}}</text>
+        <text class="result-sub">{{item.learnContent}}</text>
+      </view>
+    </view>
+    <view class="group" wx:if="{{pathResults.length > 0}}">
+      <text class="group-title">路径项目 ({{pathResults.length}})</text>
+      <view class="result-item" wx:for="{{pathResults}}" wx:key="id" bindtap="onPathTap" data-path-id="{{item.pathId}}">
+        <text class="result-code">{{item.pathTitle}} · {{item.project}}</text>
+        <text class="result-sub">{{item.requirement}}</text>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{courseResults.length === 0 && pathResults.length === 0}}">未找到相关内容</view>
+  </scroll-view>
+</view>

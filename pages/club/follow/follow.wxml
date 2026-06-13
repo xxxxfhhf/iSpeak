@@ -1,0 +1,36 @@
+<!-- 公众号/视频号关注指引 — 避免原生跳转空白 -->
+<scroll-view scroll-y class="page-scroll">
+  <view class="container">
+    <view class="hero">
+      <text class="hero-icon">📢</text>
+      <text class="hero-title">{{clubName}}</text>
+      <text class="hero-desc">关注后可获取活动通知、成长资讯与俱乐部动态</text>
+    </view>
+
+    <!-- 微信官方关注组件（小程序与公众号同主体绑定时显示） -->
+    <view class="oa-component-wrap" wx:if="{{showOfficialAccount}}">
+      <text class="block-title">一键关注</text>
+      <official-account bindload="onOfficialAccountLoad" binderror="onOfficialAccountError"></official-account>
+    </view>
+
+    <view class="steps-card">
+      <text class="block-title">如何找到我们</text>
+      <view class="step-item" wx:for="{{channels}}" wx:key="keyword">
+        <view class="step-head">
+          <text class="step-type">{{item.type}}</text>
+          <text class="step-keyword">「{{item.keyword}}」</text>
+        </view>
+        <text class="step-tip">{{item.tip}}</text>
+        <button class="copy-btn" bindtap="onCopyKeyword" data-keyword="{{item.keyword}}">复制「{{item.keyword}}」</button>
+      </view>
+    </view>
+
+    <view class="hint-card">
+      <text class="hint-text">{{followHint}}</text>
+    </view>
+
+    <button class="btn primary" wx:if="{{canTryNative}}" bindtap="onTryNativeOpen">打开公众号主页</button>
+    <button class="btn {{canTryNative ? 'outline' : 'primary'}}" bindtap="onCopyAll">复制全部搜索词</button>
+    <text class="native-note" wx:if="{{canTryNative}}">小程序已与公众号关联，可直接打开；若仍失败请用上方复制搜索</text>
+  </view>
+</scroll-view>

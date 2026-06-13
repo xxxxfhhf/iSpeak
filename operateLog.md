@@ -243,3 +243,123 @@
   - temperature 参数详解（控制生成随机性和创造性的平衡）
 
 ### 20. AI 协作增强：环节感知、案例生成与对比决策 (V10)
+
+### 27. 路径学习与导师认证界面 (V17 - 2026-06-13)
+- 注册 11 个新页面，history 首页增加路径学习/导师认证入口。
+- 新增 `utils/learningData.js`，扩展 `utils/storage.js` 学习进度存储。
+- 实现 learn 7 页 + cert 4 页完整 UI 与业务规则。
+
+### 28-29. 修复 UTF-8 BOM 导致编译失败 (2026-06-13)
+- JSON 报错 `Unexpected token in JSON at position 0`：修复 10 个 `.json` 文件。
+- WXSS 报错 `unexpected '' at pos 1`：批量修复 learn/cert 模块 30 个文件的 BOM 头。
+
+### 30. 恢复主页路径学习入口 (2026-06-13)
+- **问题**：history 首页入口与 app.json 页面注册丢失，用户看不到「路径学习」。
+- **修复**：重新注册 11 个页面；history 增加顶部 🎯 按钮 + 搜索栏下方双卡片入口；恢复 stage/cert/home 基础页面。
+
+### 32. 从 PDF 提取完整课程正文模块 (2026-06-13)
+- **来源**：`路径手册/` 下 L1/L2/L3 三份晋级手册 PDF（pdf-parse 提取正文）。
+- **脚本**：`scripts/extract-pdf.js` 提取文本；`scripts/build-course-contents.js` 解析章节并生成模块。
+- **输出**：
+  - `utils/learning/courseContents/l1.js` — 7 门（L1V1~V4、L1X1~X3）
+  - `utils/learning/courseContents/l2.js` — 5 门（L2V1 声音/舞台、L2V2、L2X1 倾听/PPT）
+  - `utils/learning/courseContents/l3.js` — 7 门（L3V1~V3、L3X1、L3X2 学会提问、L3X3 沟通风格/建立联系）
+- **格式**：每门课含 `id/stageId/title/learnContent/courseContent/practiceGoal/quiz`，`courseContent` 保留手册原文、章节编号与范例，已清理页眉页脚。
+
+### 33. 路径表格结构重构 (2026-06-13)
+- **结构**：`utils/learning/pathStructure.js` 按手册「级别-项目-要求-时间」表格定义路径，一条路径含多项目（课程+演练）。
+- **入口**：`utils/learningData.js` 聚合路径结构与完整课程正文。
+- **界面**：路径详情页表格展示全部项目；L1V1 含 1 课程+2 演练，L2V1 含 2 课程+3 演练等，与手册一致。
+
+### 34. 修复路径学习页无法加载 (2026-06-13)
+- **问题**：`utils/learningData.js` 引用路径错误（`./pathStructure`），模块加载失败导致路径学习页空白。
+- **修复**：改为 `./learning/pathStructure.js` 与 `./learning/courseContents/index.js`（小程序不支持目录自动 index 解析）。
+
+### 35. 修复小程序 courseContents 模块加载失败 (2026-06-13)
+- **问题**：`require('./learning/courseContents')` 在小程序中报 `module is not defined`。
+- **修复**：`learningData.js` 直接引用 `./learning/l1Courses.js`、`l2Courses.js`、`l3Courses.js`（扁平路径，不再经 courseContents 目录入口）。
+
+### 36. 路径详情页改版：分组展示 + 介绍内容 (2026-06-13)
+- **需求**：去掉冗余表头；课程/演练分组；必修选修标签；课程显示路径编码；补全提交资料与导师认证；增加路径/俱乐部/感谢/前言介绍。
+- **数据**：
+  - 新增 `utils/learning/pathIntro.js`（阶段前言、俱乐部简介/宗旨/使命/愿景/价值观、感谢、各路径简介）
+  - `learningData.js` 增加 `COURSE_META` 反查课程的 `pathCode/required`，导出 `getStageIntro/getPathIntro`
+- **路径详情页** `pages/learn/path/`：
+  - 移除「项目/要求/时间」表头
+  - 分为「📚 课程学习」与「🎤 线下演讲演练」两栏卡片
+  - 课程卡片显示路径编码（如 L1V1）；演练按钮改为「提交资料」
+  - 顶部展示路径介绍、手册前言、俱乐部介绍（折叠）、新会员指引、特别感谢（折叠）
+  - L3 路径底部增加导师认证入口横幅
+- **阶段页** `pages/learn/stage/`：路径 Tab 与课程 Tab 均按必修/选修分组，课程显示 pathCode
+- **提交页** `pages/learn/submit/`：补全文字+图片提交 UI 与历史记录
+- **导师认证** `pages/cert/`：补全 home/checklist/workshop/result 页面与认证流程
+
+### 37. 修复 checklist.wxss UTF-8 BOM 编译错误 (2026-06-13)
+- **问题**：`pages/cert/checklist/checklist.wxss (1:1): unexpected '' at pos 1`，WXSS 无法编译。
+- **修复**：去除文件开头 UTF-8 BOM，以纯 UTF-8 无 BOM 重新写入样式内容。
+
+### 38. 手册前言移至首页 + 课程内容排版优化 (2026-06-13)
+- **结构调整**：前言、俱乐部介绍、新会员指引、特别感谢从路径详情页移至 `pages/learn/home/`（L1 之前）；路径页仅保留当前路径简介。
+- **数据**：`pathIntro.js` 新增 `HANDBOOK_INTRO` 与 `getHandbookIntro()`；`STAGE_INTRO` 精简为阶段简要说明。
+- **课程排版**：新增 `utils/learning/contentParser.js`，课程页按章节/标签/列表/范例分色分段展示（蓝=章节、紫=标签、绿=列表、橙=范例）。
+
+### 39. 修复手册前言/俱乐部/会员指引内容不显示 (2026-06-13)
+- **问题**：首页三块介绍标题有但正文空白；俱乐部默认折叠不易发现。
+- **修复**：
+  - `contentParser.js` 新增 `enrichBlocks()`，为每块绑定静态 `cls`（解决小程序 `block-{{type}}` 动态 class 不生效）。
+  - `require` 路径补全 `.js` 后缀，避免模块加载失败。
+  - `pathIntro.js` 补全手册 PDF 原文（含会员权益表、三件事书单）。
+  - 首页默认展开俱乐部介绍；新增会员权益对照表。
+
+### 40. 自查修复手册四块内容显示 (2026-06-13)
+- **根因**：`text` 组件不支持块级排版；`class="{{item.cls}}"` 动态绑定在部分基础库下样式不生效。
+- **修复**：
+  - 改用 `view` + `wx:if` 静态 class 的 `richBlock` 模板渲染。
+  - 会员权益表并入「手册前言」卡片，表格列改用 `view` 布局。
+  - 解析器支持「第X件事」小标题、`【标题】正文` 同行拆分。
+
+### 41. 手册导读独立 Tab + 导师权益介绍 (2026-06-13)
+- **路径学习首页**：新增顶部双 Tab「路径学习 / 手册导读」，默认展示 L1/L2/L3，无需长距离下滑。
+- **手册导读 Tab**：前言、俱乐部介绍、会员指引均可折叠，与路径学习分离。
+- **快捷入口**：路径学习 Tab 内一行「手册导读」卡片，点击切换 Tab。
+- **导师认证**：新增 `utils/learning/certIntro.js`，认证中心展示导师简介、会员 vs 导师权益对照表、导师职责与认证流程。
+
+### 42. 特别感谢移至各阶段页末尾 (2026-06-13)
+- **调整**：从手册导读 Tab 移除统一感谢；L1/L2/L3 各自致谢置于 `pages/learn/stage/` 列表底部。
+- **数据**：`pathIntro.js` 的 `STAGE_INTRO` 按 PDF 分别收录三阶感谢名单与日期；新增 `getStageThanks()`。
+
+### 43. 阶段结语 + L3 中文名 + 课程链接与配图 (2026-06-13)
+- **结语**：L1/L2/L3 阶段页末尾增加「结语」区块（在「特别感谢」之前），文案来自各阶 PDF 结语页。
+- **L3 路径中文名**：`pathStructure.js` 补全 L3V1~V4、L3X1~X3 标题，格式与 L1/L2 一致（如 `L3V1（用幽默，为演讲增添笑点）`）。
+- **课程链接**：`contentParser.js` 解析正文 URL（自动修正 PDF 顿号分隔），点击跳转 `pages/learn/webview/`。
+- **课程配图**：`courseImages.js` 映射「图1/图一」等引用；正文内 📷 可点、底部配图区可 `previewImage`；资源路径 `assets/learning/{courseId}/`；脚本 `scripts/extract-course-images.js` 可从 PDF 导出。
+
+### 44. 课程写稿联动 + 公众号关注 (2026-06-13)
+- **写稿联动**：
+  - 新增 `utils/learning/courseDraft.js`：19 门课程 → 演讲模板映射（如 L1V3→英雄之旅、L3V3→SCQA）。
+  - 新增 `utils/draftFactory.js`：按模板创建项目，第一块预填练习目标与学习要点。
+  - 课程页：标记已学或测验≥80% 后显示「演练写稿」区，支持「按模板写稿」（直达编辑器）与「AI 向导写稿」（预填模板与目标）。
+  - `pages/templates/templates.js` 复用 `draftFactory`；`wizard.js` 支持 `templateId` / `goal` / `autoStep` 参数。
+- **公众号关注**：
+  - 新增 `utils/clubConfig.js`（可配置 `officialAccountUsername`）与 `utils/clubFollow.js`。
+  - 入口：路径学习首页（双 Tab 底部）、导师认证页、课程页底部链接。
+  - 已配置微信号时调用 `wx.openOfficialAccountProfile`；未配置则弹窗指引并复制搜索关键词「厦门演讲俱乐部」。
+
+### 45. 修复页面跳转与 DevTools 报错 (2026-06-13)
+- **问题**：控制台偶发 `TypeError: Cannot read property '__subPageFrameEndTime__' of null`（基础库 3.13.0 + 开发者工具内部计时问题）。
+- **代码加固**：
+  - 课程「按模板写稿」改为 `redirectTo`（与 templates 一致），去掉 toast+setTimeout 叠跳。
+  - AI 向导联动改为 Storage 传参（`wizard_course_init`），避免练习目标 URL 过长。
+  - 课程页 `onShow` 避免与 `onLoad` 重复 `loadCourse`；跳转加防重复点击。
+  - `clubFollow.js` 对 `openOfficialAccountProfile` 增加 try-catch。
+- **工程**：`project.config.json` 调试基础库由 3.13.0 调整为 3.12.1（可在开发者工具「详情 → 本地设置」手动切换）。
+
+### 46. 公众号关注页 + 边学边写 + 首页入口 (2026-06-13)
+- **空白页修复**：不再直接调用 `openOfficialAccountProfile`（未绑定同主体时会空白）；改为跳转 `pages/club/follow/follow` 指引页，分渠道展示公众号「i演讲」/ 视频号「厦门演讲俱乐部」，支持一键复制搜索词；可选 `<official-account>` 组件与「尝试打开」按钮（`enableNativeProfileJump` 默认 false）。
+- **入口扩展**：稿件首页 `history` 顶部横幅；保留路径学习首页、导师认证、课程页；新增阶段页、路径详情页底部入口。
+- **边学边写**：课程页「演练写稿」始终可见，无需标记已学或测验达标即可按模板 / AI 向导写稿。
+
+### 47. 公众号已关联 — 开启原生跳转 (2026-06-13)
+- `clubConfig.js`：`enableNativeProfileJump` 改为 `true`。
+- `clubFollow.js`：各入口点击「关注公众号」优先调用 `openOfficialAccountProfile`，失败再进入关注指引页。
+- 关注页主按钮改为「打开公众号主页」。

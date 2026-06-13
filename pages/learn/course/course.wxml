@@ -1,0 +1,82 @@
+<!-- pages/learn/course/course.wxml — 支持链接点击与配图预览 -->
+<view class="container">
+  <view class="header">
+    <text class="code">{{course.pathCode}}</text>
+    <text class="title">{{course.title}}</text>
+    <text class="tag {{course.required ? 'req' : 'opt'}}">{{course.required ? '必修' : '选修'}}</text>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <view class="section learn-section">
+      <text class="section-label">学习内容</text>
+      <text class="section-summary">{{course.learnContent}}</text>
+    </view>
+
+    <view class="section body-section">
+      <text class="section-label">课程内容</text>
+      <view class="rich-body">
+        <block wx:for="{{contentBlocks}}" wx:key="id">
+          <!-- 含链接/图引用的行内混排 -->
+          <view wx:if="{{item.segments}}" class="{{item.cls}}">
+            <block wx:for="{{item.segments}}" wx:for-item="seg" wx:key="index">
+              <text wx:if="{{seg.type === 'text'}}">{{seg.text}}</text>
+              <text wx:elif="{{seg.type === 'link'}}" class="inline-link" catchtap="onOpenLink" data-url="{{seg.url}}">{{seg.text}}</text>
+              <text wx:elif="{{seg.type === 'image'}}" class="inline-image" catchtap="onPreviewImage" data-src="{{seg.path}}"> 📷{{seg.label}} </text>
+            </block>
+          </view>
+          <!-- 普通块 -->
+          <view wx:elif="{{item.type === 'label'}}" class="block-label">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'chapter'}}" class="block-chapter">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'subheading'}}" class="block-subheading">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'list-item'}}" class="block-list-item">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'bullet'}}" class="block-bullet">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'example-title'}}" class="block-example-title">{{item.text}}</view>
+          <view wx:elif="{{item.type === 'example'}}" class="block-example">{{item.text}}</view>
+          <view wx:else class="block-paragraph">{{item.text}}</view>
+        </block>
+      </view>
+
+      <!-- 手册配图区：可点击放大 -->
+      <view class="image-gallery" wx:if="{{courseImages.length}}">
+        <text class="gallery-title">手册配图（点击查看）</text>
+        <view class="gallery-grid">
+          <view class="gallery-item" wx:for="{{courseImages}}" wx:key="ref" bindtap="onPreviewImage" data-src="{{item.path}}">
+            <image class="gallery-thumb" src="{{item.path}}" mode="aspectFill" lazy-load />
+            <text class="gallery-caption">{{item.ref}} · {{item.caption}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section goal-section">
+      <text class="section-label goal-label">练习目标</text>
+      <text class="goal-text">{{course.practiceGoal}}</text>
+    </view>
+
+    <!-- 边学边写：随时按路径模板写稿 -->
+    <view class="section draft-section">
+      <text class="section-label draft-label">演练写稿 · 边学边写</text>
+      <text class="draft-hint">本课程对应演讲模板：{{draftConfig.templateName}}</text>
+      <text class="draft-desc">{{draftConfig.templateDesc}}</text>
+      <text class="draft-tip">无需学完即可开始写稿，写完后可回到课程继续学习</text>
+      <view class="draft-btns">
+        <button class="draft-btn primary" bindtap="onStartDraft">按模板写稿</button>
+        <button class="draft-btn outline" bindtap="onStartAiDraft">AI 向导写稿</button>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="status-bar" wx:if="{{hasQuiz}}">
+    <text class="status-label">测验得分 {{quizScore}}%</text>
+    <text class="status-label {{quizPassed ? 'ok' : ''}}">{{quizPassed ? '已达标(≥80%)' : '未达标'}}</text>
+  </view>
+
+  <view class="actions">
+    <button class="btn primary" bindtap="onStartQuiz" wx:if="{{hasQuiz}}">开始答题</button>
+    <button class="btn" bindtap="onMarkLearned">标记已学习</button>
+  </view>
+
+  <view class="oa-link" bindtap="onFollowOfficialAccount">
+    <text>📢 关注公众号，获取俱乐部活动资讯</text>
+  </view>
+</view>

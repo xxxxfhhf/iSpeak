@@ -1,0 +1,21 @@
+<!-- pages/cert/checklist/checklist.wxml — 导师认证清单 -->
+<view class="container">
+  <view class="header">
+    <text class="title">导师认证清单</text>
+    <text class="sub">完成以下步骤即可成为俱乐部导师</text>
+  </view>
+
+  <view class="check-item {{item.done ? 'done' : ''}}" wx:for="{{items}}" wx:key="id" bindtap="onToggleItem" data-id="{{item.id}}">
+    <view class="check-icon">{{item.done ? '✓' : '○'}}</view>
+    <view class="check-body">
+      <text class="check-title">{{item.title}}</text>
+      <text class="check-desc">{{item.desc}}</text>
+      <text class="auto-tag" wx:if="{{item.type === 'auto'}}">系统自动检测</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="btn" bindtap="onGoWorkshop">工作坊规划（L3X1）</button>
+    <button class="btn primary" bindtap="onGoResult" disabled="{{!allDone}}">查看认证结果</button>
+  </view>
+</view>

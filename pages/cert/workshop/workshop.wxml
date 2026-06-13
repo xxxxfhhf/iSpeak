@@ -1,0 +1,28 @@
+<!-- pages/cert/workshop/workshop.wxml — SMART 工作坊规划 -->
+<view class="container">
+  <view class="header">
+    <text class="title">认证工作坊规划</text>
+    <text class="sub">按 SMART 原则规划 L3X1 导师认证工作坊</text>
+  </view>
+
+  <view class="form-item">
+    <text class="label">Specific 具体目标</text>
+    <input class="input" placeholder="例：完成「幽默技巧」主题工作坊" value="{{goal}}" bindinput="onGoalInput" />
+  </view>
+  <view class="form-item">
+    <text class="label">主题与内容</text>
+    <input class="input" placeholder="任选一门演讲知识" value="{{topic}}" bindinput="onTopicInput" />
+  </view>
+  <view class="form-item">
+    <text class="label">Time 计划日期</text>
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="picker">{{date || '选择日期'}}</view>
+    </picker>
+  </view>
+  <view class="form-item">
+    <text class="label">Achievable 目标评分（≥80）</text>
+    <input class="input" type="number" placeholder="综合评分" value="{{score}}" bindinput="onScoreInput" />
+  </view>
+
+  <button class="save-btn" bindtap="onSave">保存规划</button>
+</view>

@@ -1,4 +1,5 @@
 const Storage = require('../../utils/storage');
+const { openOfficialAccount } = require('../../utils/clubFollow.js');
 
 Page({
   data: {
@@ -45,7 +46,7 @@ Page({
         ...p,
         durationStr,
         timeAgo,
-        typeLabel: p.type === 'toastmasters_story' ? '头马' : '职场'
+        typeLabel: '通用' // 统一显示为通用，或根据需要自定义
       };
     }).sort((a, b) => b.updatedAt - a.updatedAt);
 
@@ -115,6 +116,25 @@ Page({
     wx.navigateTo({
       url: '/pages/library/library'
     });
+  },
+
+  /** 进入路径学习首页 */
+  onGoToLearning() {
+    wx.navigateTo({
+      url: '/pages/learn/home/home'
+    });
+  },
+
+  /** 进入导师认证首页 */
+  onGoToMentorCert() {
+    wx.navigateTo({
+      url: '/pages/cert/home/home'
+    });
+  },
+
+  /** 关注公众号指引 */
+  onFollowOfficialAccount() {
+    openOfficialAccount();
   },
 
   onNewAiWizard() {

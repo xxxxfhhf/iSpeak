@@ -46,6 +46,87 @@
   border-radius: 50%;
 }
 
+.learn-btn {
+  font-size: 36rpx;
+  width: 72rpx;
+  background-color: #e8f4fd;
+  border-radius: 50%;
+}
+
+/* 路径学习与导师认证入口 */
+.learn-entry-bar {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 20rpx 20rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.learn-entry-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(0, 122, 255, 0.15);
+}
+
+.learn-entry-card.cert {
+  background: linear-gradient(135deg, #f5f0ff 0%, #ede8fd 100%);
+  border-color: rgba(88, 86, 214, 0.15);
+}
+
+.entry-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.entry-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.entry-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.entry-desc {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.entry-arrow {
+  font-size: 36rpx;
+  color: #ccc;
+  font-weight: 300;
+}
+
+.oa-banner {
+  display: flex;
+  align-items: center;
+  margin: 0 20rpx 16rpx;
+  padding: 22rpx 24rpx;
+  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+  border: 1rpx solid #ffe0b2;
+  border-radius: 16rpx;
+}
+
+.oa-banner-icon { font-size: 40rpx; margin-right: 16rpx; }
+
+.oa-banner-info { flex: 1; display: flex; flex-direction: column; }
+
+.oa-banner-title { font-size: 28rpx; font-weight: bold; color: #333; }
+
+.oa-banner-sub { font-size: 22rpx; color: #888; margin-top: 4rpx; }
+
+.oa-banner-arrow { font-size: 36rpx; color: #ccc; }
+
 .new-btn-wrapper {
   position: relative;
 }

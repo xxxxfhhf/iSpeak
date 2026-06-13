@@ -1,0 +1,71 @@
+<!-- pages/learn/path/path.wxml — 路径详情：仅保留路径介绍 + 任务分组 -->
+<scroll-view scroll-y class="container">
+  <view class="header">
+    <text class="code">{{path.code}}</text>
+    <text class="title">{{path.title}}</text>
+    <text class="tag {{path.required ? 'req' : 'opt'}}">{{path.required ? '必修路径' : '选修路径'}}</text>
+  </view>
+
+  <!-- 当前路径简介 -->
+  <view class="intro-block" wx:if="{{pathIntro}}">
+    <text class="intro-label">路径介绍</text>
+    <text class="intro-text">{{pathIntro}}</text>
+  </view>
+
+  <!-- 课程学习栏 -->
+  <view class="section" wx:if="{{courseItems.length}}">
+    <view class="section-head">
+      <text class="section-title">📚 课程学习</text>
+      <text class="section-sub">完成课程学习与测验（≥80%）</text>
+    </view>
+    <view class="task-card course-card" wx:for="{{courseItems}}" wx:key="id">
+      <view class="card-top">
+        <text class="project-code">{{path.code}}</text>
+        <text class="type-badge course">课程学习</text>
+      </view>
+      <text class="project-name">{{item.project}}</text>
+      <text class="req-text">{{item.requirement}}</text>
+      <text class="time-text" wx:if="{{item.duration}}">时长：{{item.duration}}</text>
+      <view class="row-actions">
+        <button class="mini-btn primary" bindtap="onOpenCourse" data-course-id="{{item.courseId}}">学习课程</button>
+        <text class="status-tag {{item.isCompleted ? 'done' : ''}}">{{item.statusText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 线下演讲演练栏 -->
+  <view class="section" wx:if="{{taskItems.length}}">
+    <view class="section-head">
+      <text class="section-title">🎤 线下演讲演练</text>
+      <text class="section-sub">提交资料 + 俱乐部线下通过</text>
+    </view>
+    <view class="task-card speech-card" wx:for="{{taskItems}}" wx:key="id">
+      <view class="card-top">
+        <text class="project-code">{{item.code}}</text>
+        <text class="type-badge task">路径演练</text>
+      </view>
+      <text class="project-name">{{item.project}}</text>
+      <text class="req-text">{{item.requirement}}</text>
+      <text class="time-text highlight" wx:if="{{item.duration}}">{{item.duration}}</text>
+      <view class="row-actions">
+        <button class="mini-btn" bindtap="onSubmit" data-item-id="{{item.id}}" disabled="{{!isUnlocked}}">提交资料</button>
+        <button class="mini-btn outline" bindtap="onMarkOffline" data-item-id="{{item.id}}" disabled="{{!isUnlocked || !item.hasSubmission}}">线下通过</button>
+        <text class="status-tag {{item.isCompleted ? 'done' : ''}}">{{item.statusText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- L3 导师认证入口 -->
+  <view class="cert-banner" wx:if="{{isL3Stage}}">
+    <text class="cert-title">🎓 导师认证</text>
+    <text class="cert-desc">完成 L3 必修路径后可申请导师认证，选修 L3X1 可规划认证工作坊。</text>
+    <button class="cert-btn" bindtap="onGoToCert">进入导师认证中心</button>
+  </view>
+
+  <view class="oa-inline" bindtap="onFollowOfficialAccount">
+    <text>📢 关注公众号「i演讲」· 活动与成长资讯 ›</text>
+  </view>
+
+  <view class="footer-tip" wx:if="{{!isUnlocked}}">阶段未解锁：可预览内容，不可提交/标记通过</view>
+  <view class="bottom-space"></view>
+</scroll-view>
