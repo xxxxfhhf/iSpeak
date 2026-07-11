@@ -10,6 +10,13 @@ App({
           console.log("初始化完成：")
     }
 
+    // 学习路径 L→G 迁移（手册 V5：沟通力体系用 G）
+    try {
+      require('./utils/learning/migrateIds.js').migrateLearningIdsIfNeeded();
+    } catch (e) {
+      console.warn('学习路径迁移跳过', e);
+    }
+
     // 检查本地存储
     const projects = wx.getStorageSync('projects');
     if (!projects) {

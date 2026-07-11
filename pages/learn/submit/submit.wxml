@@ -1,35 +1,78 @@
-<!-- pages/learn/submit/submit.wxml — 提交演练资料 -->
-<view class="container">
-  <view class="header">
-    <text class="title">提交资料</text>
-    <text class="sub">记录演讲稿、照片或心得，供导师/点评官参考</text>
-  </view>
-
-  <view class="form-section">
-    <text class="label">文字说明</text>
-    <textarea class="textarea" placeholder="填写演讲要点、反思或备注..." value="{{textContent}}" bindinput="onTextInput" maxlength="2000" />
-  </view>
-
-  <view class="form-section">
-    <text class="label">图片附件（最多9张）</text>
-    <view class="image-grid">
-      <view class="image-item" wx:for="{{images}}" wx:key="*this">
-        <image src="{{item}}" mode="aspectFill" class="thumb" />
-        <view class="remove" bindtap="onRemoveImage" data-index="{{index}}">×</view>
-      </view>
-      <view class="add-btn" bindtap="onChooseImage" wx:if="{{images.length < 9}}">
-        <text>+</text>
-      </view>
-    </view>
-  </view>
-
-  <button class="submit-btn" bindtap="onSubmit">提交资料</button>
-
-  <view class="history" wx:if="{{history.length}}">
-    <text class="history-title">提交记录</text>
-    <view class="history-item" wx:for="{{history}}" wx:key="id">
-      <text class="history-time">{{item.timeStr}}</text>
-      <text class="history-text">{{item.text || '（仅图片）'}}</text>
-    </view>
-  </view>
-</view>
+<!-- pages/learn/submit/submit.wxml — 提交演练资料，支持图片回看 -->
+<view class="container">
+  <view class="header">
+    <text class="title">提交资料</text>
+    <text class="sub">记录演讲稿、照片或心得，供导师/点评官参考</text>
+  </view>
+
+  <view class="form-section">
+    <text class="label">文字说明</text>
+    <textarea class="textarea" placeholder="填写演讲要点、反思或备注..." value="{{textContent}}" bindinput="onTextInput" maxlength="2000" />
+  </view>
+
+  <view class="form-section">
+    <text class="label">图片附件（最多9张）</text>
+    <view class="image-grid">
+      <view class="image-item" wx:for="{{images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill" class="thumb" bindtap="onPreviewPendingImage" data-url="{{item}}" />
+        <view class="remove" bindtap="onRemoveImage" data-index="{{index}}">×</view>
+      </view>
+      <view class="add-btn" bindtap="onChooseImage" wx:if="{{images.length < 9}}">
+        <text>+</text>
+      </view>
+    </view>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" loading="{{submitting}}" disabled="{{submitting}}">提交资料</button>
+
+  <view class="history" wx:if="{{history.length}}">
+    <text class="history-title">提交记录（点击查看）</text>
+    <view class="history-item" wx:for="{{history}}" wx:key="id" bindtap="onViewHistory" data-index="{{index}}">
+      <view class="history-head">
+        <text class="history-time">{{item.timeStr}}</text>
+        <text class="history-badge" wx:if="{{item.imageCount}}">{{item.imageCount}} 张图</text>
+      </view>
+      <text class="history-text">{{item.text || '（仅图片，点击查看）'}}</text>
+      <view class="history-thumb-row" wx:if="{{item.displayImages.length}}">
+        <image
+          wx:for="{{item.displayImages}}"
+          wx:for-item="img"
+          wx:key="*this"
+          src="{{img}}"
+          mode="aspectFill"
+          class="history-thumb"
+        />
+      </view>
+      <text class="history-expired" wx:elif="{{item.imageCount && !item.displayImages.length}}">图片已失效，请重新提交</text>
+    </view>
+  </view>
+</view>
+
+<!-- 提交详情弹层 -->
+<view class="detail-mask" wx:if="{{viewingItem}}" bindtap="onCloseDetail">
+  <view class="detail-panel" catchtap="preventBubble">
+    <view class="detail-head">
+      <text class="detail-title">提交详情</text>
+      <text class="detail-close" bindtap="onCloseDetail">×</text>
+    </view>
+    <text class="detail-time">{{viewingItem.timeStr}}</text>
+    <scroll-view scroll-y class="detail-body">
+      <text class="detail-text" wx:if="{{viewingItem.text}}">{{viewingItem.text}}</text>
+      <text class="detail-text muted" wx:else>（无文字说明）</text>
+      <view class="detail-images" wx:if="{{viewingItem.displayImages.length}}">
+        <image
+          wx:for="{{viewingItem.displayImages}}"
+          wx:for-item="img"
+          wx:key="*this"
+          src="{{img}}"
+          mode="widthFix"
+          class="detail-image"
+          bindtap="onPreviewHistoryImage"
+          data-url="{{img}}"
+          data-urls="{{viewingItem.displayImages}}"
+        />
+      </view>
+      <text class="detail-expired" wx:elif="{{viewingItem.imageCount}}">图片无法加载（可能是旧版临时路径），请重新提交</text>
+    </scroll-view>
+  </view>
+</view>

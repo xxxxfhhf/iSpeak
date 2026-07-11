@@ -84,6 +84,65 @@
   text-align: right;
 }
 
+/* 会员等级选择 */
+.member-level-bar {
+  margin: 20rpx 0 24rpx;
+  padding: 20rpx;
+  background: #f8f9ff;
+  border-radius: 12rpx;
+  border: 1rpx solid #e8ecff;
+}
+
+.level-bar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.level-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.level-current {
+  font-size: 24rpx;
+  color: #5856d6;
+  font-weight: 600;
+}
+
+.level-tags {
+  display: flex;
+  gap: 16rpx;
+}
+
+.level-tag {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #666;
+  background: #fff;
+  border-radius: 12rpx;
+  border: 2rpx solid #e0e0e0;
+}
+
+.level-tag.active {
+  color: #fff;
+  background: #5856d6;
+  border-color: #5856d6;
+}
+
+.level-hint {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 12rpx;
+  display: block;
+  line-height: 1.5;
+}
+
 /* 手册导读快捷入口（路径学习 Tab 内一行卡片） */
 .guide-entry {
   display: flex;

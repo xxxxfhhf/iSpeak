@@ -1,0 +1,38 @@
+<!-- AI 主题灵感 -->
+<scroll-view scroll-y class="page">
+  <view class="hero">
+    <text class="hero-title">主题灵感</text>
+    <text class="hero-sub">混元 AI · 为例会策划主题</text>
+  </view>
+
+  <view class="body">
+    <view class="form">
+      <text class="label">场合</text>
+      <picker mode="selector" range="{{occasions}}" value="{{occasionIndex}}" bindchange="onOccasionChange">
+        <view class="picker">{{occasions[occasionIndex]}} ▾</view>
+      </picker>
+
+      <text class="label">关键词</text>
+      <input class="input" placeholder="例：春天、勇气、职场沟通" value="{{keyword}}" bindinput="onKeywordInput" />
+
+      <button class="gen-btn {{loading ? 'disabled' : ''}}" bindtap="onGenerate" loading="{{loading}}" disabled="{{loading}}">
+        {{loading ? 'AI 生成中…' : '获取灵感'}}
+      </button>
+    </view>
+
+    <view class="stream" wx:if="{{streamText && !themes.length}}">
+      <text class="stream-text">{{streamText}}</text>
+    </view>
+
+    <view class="list" wx:if="{{themes.length}}">
+      <view class="theme-card" wx:for="{{themes}}" wx:key="title">
+        <text class="theme-title">{{item.title}}</text>
+        <text class="theme-reason">{{item.reason}}</text>
+        <view class="theme-actions">
+          <text class="act" bindtap="onCopy" data-title="{{item.title}}">复制</text>
+          <text class="act primary" bindtap="onUseAgenda" data-title="{{item.title}}">用于议程</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

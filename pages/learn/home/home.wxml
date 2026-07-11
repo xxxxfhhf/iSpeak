@@ -14,7 +14,7 @@
 </template>
 
 <view class="page">
-  <!-- 顶部 Tab：默认路径学习，不挡 L1/L2/L3 -->
+  <!-- 顶部 Tab：默认路径学习，不挡 G1/G2/G3 -->
   <view class="top-tabs">
     <view class="top-tab {{activeTab === 'learn' ? 'active' : ''}}" bindtap="onTabChange" data-tab="learn">路径学习</view>
     <view class="top-tab {{activeTab === 'guide' ? 'active' : ''}}" bindtap="onTabChange" data-tab="guide">手册导读</view>
@@ -27,6 +27,25 @@
       <block wx:if="{{activeTab === 'learn'}}">
         <view class="header">
           <text class="title">厦门演讲俱乐部 · 路径手册</text>
+
+          <!-- 会员等级：老会员按俱乐部评定选择 G1/G2/G3 -->
+          <view class="member-level-bar">
+            <view class="level-bar-top">
+              <text class="level-label">我的等级</text>
+              <text class="level-current">{{memberLevelLabel}}</text>
+            </view>
+            <view class="level-tags">
+              <view
+                class="level-tag {{memberLevel === item.id ? 'active' : ''}}"
+                wx:for="{{levelOptions}}"
+                wx:key="id"
+                bindtap="onSetMemberLevel"
+                data-level="{{item.id}}"
+              >{{item.id}}</view>
+            </view>
+            <text class="level-hint">按俱乐部评定选择等级，解锁对应阶段；新会员从 G1 开始</text>
+          </view>
+
           <view class="progress-section">
             <view class="progress-item">
               <text class="progress-label">课程进度</text>
@@ -70,7 +89,7 @@
               </view>
               <view class="lock-mask" wx:if="{{item.status === 'locked'}}">
                 <icon type="warn" size="24" color="#999" />
-                <text>上一阶段完成后解锁</text>
+                <text>完成上一阶或提升会员等级后解锁</text>
               </view>
             </view>
           </block>

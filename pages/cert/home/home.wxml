@@ -12,7 +12,7 @@
     <view class="hero">
       <text class="hero-icon">🎓</text>
       <text class="hero-title">导师认证中心</text>
-      <text class="hero-desc">完成 L3 必修路径后，可申请成为俱乐部导师</text>
+      <text class="hero-desc">完成 G3 必修路径后，可申请成为俱乐部导师</text>
     </view>
 
     <!-- 导师简介 -->
@@ -60,8 +60,8 @@
     <!-- 认证流程 -->
     <view class="info-card flow-card">
       <text class="info-title">认证流程</text>
-      <text class="info-step">1. 完成 L3V1~L3V4 全部必修路径</text>
-      <text class="info-step">2. 选修 L3X1，按 SMART 原则规划并开展认证工作坊</text>
+      <text class="info-step">1. 完成 G3V1~G3V4 全部必修路径</text>
+      <text class="info-step">2. 选修 G3X1，按 SMART 原则规划并开展认证工作坊</text>
       <text class="info-step">3. 通过导师现场评审，提交认证申请</text>
       <text class="info-step">4. 领取导师证书，开始带教新会员</text>
     </view>

@@ -11,7 +11,7 @@ const l1Courses = require('./learning/l1Courses.js').COURSES;
 const l2Courses = require('./learning/l2Courses.js').COURSES;
 const l3Courses = require('./learning/l3Courses.js').COURSES;
 
-/** 全部课程（L1 + L2 + L3） */
+/** 全部课程（G1 + G2 + G3） */
 const COURSES = l1Courses.concat(l2Courses, l3Courses);
 
 /** 从路径结构反查课程所属路径编码与必修/选修 */
@@ -35,22 +35,22 @@ const COURSE_META = buildCourseMetaMap();
 
 const STAGES = [
   {
-    id: 'L1',
-    title: 'L1 第一阶',
+    id: 'G1',
+    title: 'G1 第一阶',
     desc: '自我介绍、演讲结构、故事、点评；选修开场/正文/结尾',
-    unlockHint: '默认解锁，完成全部必修路径后解锁 L2'
+    unlockHint: '默认解锁，完成全部必修路径后解锁 G2'
   },
   {
-    id: 'L2',
-    title: 'L2 第二阶',
+    id: 'G2',
+    title: 'G2 第二阶',
     desc: '台风声音、阅读分享、回顾总结；选修 PPT 分享',
-    unlockHint: '需完成 L1 全部必修路径'
+    unlockHint: '需完成 G1 全部必修路径'
   },
   {
-    id: 'L3',
-    title: 'L3 第三阶',
+    id: 'G3',
+    title: 'G3 第三阶',
     desc: '幽默、说服、职场社交、总结性演讲；导师认证选修',
-    unlockHint: '需完成 L2 全部必修路径'
+    unlockHint: '需完成 G2 全部必修路径'
   }
 ];
 
@@ -143,5 +143,11 @@ module.exports = {
   getCourseImages: courseImages.getCourseImages,
   getCourseDraftConfig: courseDraft.getCourseDraftConfig,
   startDraftFromCourse: courseDraft.startDraftFromCourse,
-  buildAiFragmentFromCourse: courseDraft.buildAiFragment
+  buildAiFragmentFromCourse: courseDraft.buildAiFragment,
+  getMemberLevel: () => require('./memberLevel.js').getMemberLevel(),
+  setMemberLevel: (level) => require('./memberLevel.js').setMemberLevel(level),
+  isStageUnlocked: (stageId, pathMap) => {
+    const ml = require('./memberLevel.js');
+    return ml.isStageUnlocked(stageId, pathMap, (pathId, map) => module.exports.isPathGroupCompleted(pathId, map));
+  }
 };

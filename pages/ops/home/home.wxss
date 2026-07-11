@@ -1,0 +1,66 @@
+.page {
+  height: 100vh;
+  background: #f5f7fa;
+  box-sizing: border-box;
+}
+
+.hero {
+  background: linear-gradient(135deg, #007aff, #5ac8fa);
+  padding: 56rpx 40rpx 64rpx;
+  color: #fff;
+}
+
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 600;
+  display: block;
+}
+
+.hero-sub {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-top: 12rpx;
+  display: block;
+}
+
+.tool-list {
+  padding: 0 24rpx 40rpx;
+  margin-top: -32rpx;
+}
+
+.tool-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 122, 255, 0.08);
+}
+
+.tool-icon {
+  font-size: 48rpx;
+}
+
+.tool-text {
+  flex: 1;
+}
+
+.tool-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.tool-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.arrow {
+  color: #ccc;
+  font-size: 36rpx;
+}

@@ -2,6 +2,7 @@
 const LearningData = require('../../../utils/learningData.js');
 const { parseCourseContent, enrichBlocks } = require('../../../utils/learning/contentParser.js');
 const { openOfficialAccount, ClubConfig } = require('../../../utils/clubFollow.js');
+const MemberLevel = require('../../../utils/memberLevel.js');
 
 Page({
   data: {
@@ -16,7 +17,10 @@ Page({
     showClubIntro: false,
     showPreface: false,
     showMemberTips: false,
-    clubFollowHint: '公众号「i演讲」· 视频号「厦门演讲俱乐部」'
+    clubFollowHint: '公众号「i演讲」· 视频号「厦门演讲俱乐部」',
+    memberLevel: 'G1',
+    memberLevelLabel: 'G1 第一阶',
+    levelOptions: []
   },
 
   onLoad(options) {
@@ -24,6 +28,7 @@ Page({
       this.setData({ activeTab: 'guide' });
     }
     this.loadHandbookIntro();
+    this.setData({ levelOptions: MemberLevel.getLevelOptions() });
     this.loadProgress();
   },
 
@@ -56,29 +61,33 @@ Page({
   loadProgress() {
     const courseMap = wx.getStorageSync('user_course_progress') || {};
     const pathMap = wx.getStorageSync('user_path_progress') || {};
+    const memberLevel = MemberLevel.getMemberLevel();
+    const isPathDone = (pathId) => LearningData.isPathGroupCompleted(pathId, pathMap);
 
     const totalCourses = LearningData.COURSES.length;
     const doneCourses = LearningData.COURSES.filter(c => courseMap[c.id] && courseMap[c.id].isCompleted).length;
 
     const requiredPaths = LearningData.PATHS.filter(p => p.required);
-    const donePaths = requiredPaths.filter(p => LearningData.isPathGroupCompleted(p.id, pathMap)).length;
+    const donePaths = requiredPaths.filter(p => isPathDone(p.id)).length;
 
     const stages = LearningData.STAGES.map(stage => {
       const stagePaths = LearningData.getRequiredPathsByStage(stage.id);
       const stageCourses = LearningData.getCoursesByStage(stage.id);
-      const pathCompleted = stagePaths.filter(p => LearningData.isPathGroupCompleted(p.id, pathMap)).length;
+      const pathCompleted = stagePaths.filter(p => isPathDone(p.id)).length;
       const courseCompleted = stageCourses.filter(c => courseMap[c.id] && courseMap[c.id].isCompleted).length;
 
-      let status = 'locked';
-      if (stage.id === 'L1') status = 'in_progress';
-      else if (stage.id === 'L2' && this.allRequiredDone('L1', pathMap)) status = 'in_progress';
-      else if (stage.id === 'L3' && this.allRequiredDone('L2', pathMap)) status = 'in_progress';
+      const status = MemberLevel.getStageStatus(
+        stage.id,
+        pathMap,
+        isPathDone,
+        { pathCompleted, pathTotal: stagePaths.length, courseCompleted, courseTotal: stageCourses.length }
+      );
 
-      if (stage.id === 'L1' && pathCompleted === stagePaths.length && courseCompleted === stageCourses.length) status = 'completed';
-      if (stage.id === 'L2' && status === 'in_progress' && pathCompleted === stagePaths.length) status = 'completed';
-      if (stage.id === 'L3' && status === 'in_progress' && pathCompleted === stagePaths.length) status = 'completed';
-
-      const statusTextMap = { locked: '未解锁', in_progress: '进行中', completed: '已完成' };
+      const statusTextMap = {
+        locked: '未解锁',
+        in_progress: MemberLevel.isStageUnlockedByLevel(stage.id) ? '进行中' : '进行中',
+        completed: '已完成'
+      };
       return {
         id: stage.id,
         name: stage.title,
@@ -87,19 +96,37 @@ Page({
         pathCompleted,
         pathTotal: stagePaths.length,
         courseCompleted,
-        courseTotal: stageCourses.length
+        courseTotal: stageCourses.length,
+        unlockedByLevel: MemberLevel.isStageUnlockedByLevel(stage.id)
       };
     });
 
     this.setData({
+      memberLevel,
+      memberLevelLabel: MemberLevel.getLevelLabel(memberLevel),
       courseProgress: totalCourses ? Math.round(doneCourses / totalCourses * 100) : 0,
       pathProgress: requiredPaths.length ? Math.round(donePaths / requiredPaths.length * 100) : 0,
       stages
     });
   },
 
-  allRequiredDone(stageId, pathMap) {
-    return LearningData.getRequiredPathsByStage(stageId).every(p => LearningData.isPathGroupCompleted(p.id, pathMap));
+  /** 设置会员等级（按俱乐部评定） */
+  onSetMemberLevel(e) {
+    const level = e.currentTarget.dataset.level;
+    const current = this.data.memberLevel;
+    if (level === current) return;
+    const opt = MemberLevel.getLevelOptions().find(o => o.id === level);
+    wx.showModal({
+      title: '设置会员等级',
+      content: `确认为「${opt ? opt.name : level}」？\n${opt ? opt.desc : ''}\n\n将解锁该等级及之前所有阶段的学习与提交。`,
+      success: (res) => {
+        if (res.confirm) {
+          MemberLevel.setMemberLevel(level);
+          wx.showToast({ title: '等级已更新', icon: 'success' });
+          this.loadProgress();
+        }
+      }
+    });
   },
 
   onTogglePreface() {
@@ -115,7 +142,13 @@ Page({
   },
 
   onStageTap(e) {
-    wx.navigateTo({ url: `/pages/learn/stage/stage?id=${e.currentTarget.dataset.id}` });
+    const id = e.currentTarget.dataset.id;
+    const stage = this.data.stages.find(s => s.id === id);
+    if (stage && stage.status === 'locked') {
+      wx.showToast({ title: '请先完成上一阶或设置对应会员等级', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: `/pages/learn/stage/stage?id=${id}` });
   },
 
   onContinueLearn() {

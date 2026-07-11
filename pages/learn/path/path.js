@@ -1,6 +1,7 @@
 // pages/learn/path/path.js — 一条路径含多门课程 + 多个演练项目
 const LearningData = require('../../../utils/learningData');
 const { openOfficialAccount } = require('../../../utils/clubFollow.js');
+const MemberLevel = require('../../../utils/memberLevel.js');
 
 const PATH_PROGRESS_KEY = 'user_path_progress';
 const COURSE_PROGRESS_KEY = 'user_course_progress';
@@ -13,14 +14,11 @@ Page({
     courseItems: [],
     taskItems: [],
     pathIntro: '',
-    isL3Stage: false
+    isG3Stage: false
   },
 
   onLoad(options) {
-    this.setData({
-      pathId: options.id,
-      isUnlocked: options.unlocked !== 'false'
-    });
+    this.setData({ pathId: options.id });
     this.loadPath();
   },
 
@@ -64,6 +62,8 @@ Page({
     const courseItems = path.items.filter(i => i.type === 'course').map(enrichCourse);
     const taskItems = path.items.filter(i => i.type === 'task').map(enrichTask);
     const pathIntro = LearningData.getPathIntro(pathId) || '';
+    const isPathDone = (pid) => LearningData.isPathGroupCompleted(pid, progressMap);
+    const isUnlocked = MemberLevel.isStageUnlocked(path.stageId, progressMap, isPathDone);
 
     wx.setNavigationBarTitle({ title: path.code });
     this.setData({
@@ -71,7 +71,8 @@ Page({
       courseItems,
       taskItems,
       pathIntro,
-      isL3Stage: path.stageId === 'L3'
+      isG3Stage: path.stageId === 'G3',
+      isUnlocked
     });
   },
 

@@ -1,0 +1,49 @@
+<!-- 官员 Tab — 职责介绍 + 本届名单 + 议程入口 -->
+<scroll-view scroll-y class="page">
+  <view class="hero">
+    <text class="hero-title">官员运营中心</text>
+    <text class="hero-sub">俱乐部架构 · 职责说明 · 会议策划</text>
+  </view>
+
+  <view class="card">
+    <text class="card-title">快捷操作</text>
+    <view class="action-row" bindtap="onCreateAgenda">
+      <text class="action-icon">📋</text>
+      <view class="action-info">
+        <text class="action-name">创建会议议程</text>
+        <text class="action-desc">积木搭建 · 预览 · 分享 · 导出 Excel</text>
+      </view>
+      <text class="action-arrow">›</text>
+    </view>
+    <view class="action-row" bindtap="onListAgendas">
+      <text class="action-icon">📂</text>
+      <view class="action-info">
+        <text class="action-name">我的议程草稿</text>
+        <text class="action-desc">本地保存的议程</text>
+      </view>
+      <text class="action-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <text class="card-title">官员职责</text>
+    <view class="duty-item" wx:for="{{duties}}" wx:key="id">
+      <text class="duty-title">{{item.title}}</text>
+      <text class="duty-text">{{item.duty}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <text class="card-title">本届官员（示例，可在议程中修改）</text>
+    <view class="officer-row head">
+      <text class="col-title">职位</text>
+      <text class="col-name">姓名</text>
+      <text class="col-phone">电话</text>
+    </view>
+    <view class="officer-row" wx:for="{{officers}}" wx:key="title">
+      <text class="col-title">{{item.title}}</text>
+      <text class="col-name">{{item.name}}</text>
+      <text class="col-phone">{{item.phone}}</text>
+    </view>
+  </view>
+</scroll-view>

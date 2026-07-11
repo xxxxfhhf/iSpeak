@@ -2,10 +2,11 @@
 const LearningData = require('../../../utils/learningData.js');
 const { parseCourseContent, enrichBlocks } = require('../../../utils/learning/contentParser.js');
 const { openOfficialAccount } = require('../../../utils/clubFollow.js');
+const MemberLevel = require('../../../utils/memberLevel.js');
 
 Page({
   data: {
-    stageId: 'L1',
+    stageId: 'G1',
     stage: {},
     isUnlocked: true,
     activeTab: 'path',
@@ -20,7 +21,7 @@ Page({
   },
 
   onLoad(options) {
-    this.setData({ stageId: options.id || 'L1' });
+    this.setData({ stageId: options.id || 'G1' });
     this.loadStageData();
   },
 
@@ -32,7 +33,8 @@ Page({
     const { stageId } = this.data;
     const stage = LearningData.getStage(stageId) || {};
     const pathMap = wx.getStorageSync('user_path_progress') || {};
-    const isUnlocked = stageId === 'L1' || this.checkPrevStageDone(stageId, pathMap);
+    const isPathDone = (pathId) => LearningData.isPathGroupCompleted(pathId, pathMap);
+    const isUnlocked = MemberLevel.isStageUnlocked(stageId, pathMap, isPathDone);
 
     const paths = LearningData.getPathsByStage(stageId).map(p => ({
       ...p,
@@ -66,12 +68,6 @@ Page({
     });
   },
 
-  checkPrevStageDone(stageId, pathMap) {
-    const prevId = stageId === 'L2' ? 'L1' : stageId === 'L3' ? 'L2' : null;
-    if (!prevId) return true;
-    return LearningData.getRequiredPathsByStage(prevId).every(p => LearningData.isPathGroupCompleted(p.id, pathMap));
-  },
-
   onTabChange(e) {
     this.setData({ activeTab: e.currentTarget.dataset.tab });
   },
@@ -86,7 +82,7 @@ Page({
 
   onPathTap(e) {
     wx.navigateTo({
-      url: `/pages/learn/path/path?id=${e.currentTarget.dataset.id}&unlocked=${this.data.isUnlocked}`
+      url: `/pages/learn/path/path?id=${e.currentTarget.dataset.id}`
     });
   },
 

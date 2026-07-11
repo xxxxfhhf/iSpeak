@@ -55,10 +55,10 @@
     </view>
   </view>
 
-  <!-- L3 导师认证入口 -->
-  <view class="cert-banner" wx:if="{{isL3Stage}}">
+  <!-- G3 导师认证入口 -->
+  <view class="cert-banner" wx:if="{{isG3Stage}}">
     <text class="cert-title">🎓 导师认证</text>
-    <text class="cert-desc">完成 L3 必修路径后可申请导师认证，选修 L3X1 可规划认证工作坊。</text>
+    <text class="cert-desc">完成 G3 必修路径后可申请导师认证，选修 G3X1 可规划认证工作坊。</text>
     <button class="cert-btn" bindtap="onGoToCert">进入导师认证中心</button>
   </view>
 

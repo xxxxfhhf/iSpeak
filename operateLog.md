@@ -363,3 +363,47 @@
 - `clubConfig.js`：`enableNativeProfileJump` 改为 `true`。
 - `clubFollow.js`：各入口点击「关注公众号」优先调用 `openOfficialAccountProfile`，失败再进入关注指引页。
 - 关注页主按钮改为「打开公众号主页」。
+
+### 48. 会员等级分级 + 资料图片云存储回看 (2026-06-13)
+- **会员分级**：新增 `utils/memberLevel.js`；路径学习首页「我的等级」可选 L1/L2/L3，按俱乐部评定解锁对应阶段（与路径进度解锁并存）。
+- **阶段/路径解锁**：`stage.js`、`path.js`、`home.js` 统一使用 `MemberLevel.isStageUnlocked`。
+- **资料图片**：新增 `utils/submissionStorage.js`，提交时图片持久化保存；历史记录展示缩略图，点击可查看详情与 `previewImage` 大图（修复临时路径失效问题）。
+
+### 49. 资料图片改本地保存（云存储预留） (2026-06-13)
+- `submissionStorage.js`：默认 `IMAGE_STORAGE_MODE = 'local'`，用 `saveFile` 写入用户目录 `{ storage: 'local', path }`。
+- 保留 `cloud` 模式与 `fileID` 解析逻辑，未来改配置即可切换云存储。
+- 提交页 loading 文案改为「保存中...」。
+
+### 50. 三 Tab 导航 + 议程积木搭建 + 角色工具 (2026-06-13)
+- **TabBar**：会员（原稿件首页）/ 官员 / 角色 三分栏。
+- **官员 Tab**：职责说明、官员名单、创建议程入口。
+- **角色 Tab**：议程搭建、时间牌、角色介绍、主持稿模板（总主持/即兴，参考 Toastmasters 结构）。
+- **议程单页搭建** `pages/role/agenda/edit`：预设（677标准/678马拉松/681工作坊/即兴/备稿/空白）+ 积木开关表格填写 + 实时预览 + 本地草稿 + 云端分享（`meeting_agendas`）+ 导出 Excel（SpreadsheetML .xls）。
+- **数据**：`utils/club/agendaBlocks.js`、`agendaPresets.js`、`agendaCalculator.js`、`agendaExport.js`、`agendaCloud.js`、`roleScripts.js`、`officerConfig.js`。
+- **云开发**：分享协作需在控制台创建集合 `meeting_agendas`（建议所有用户可读可写）。
+
+### 51. 会员 Tab 标题微调 (2026-06-13)
+- `pages/history/history.json`：导航栏标题改为「会员 · 我的稿件」，与 Tab「会员」一致。
+
+### 52. 界面简洁化优化（配色不变） (2026-06-13)
+- **统一视觉**：页面背景 `#f5f7fa`，卡片圆角 20rpx + 轻阴影，区块标题左侧橙色/紫色强调条。
+- **角色 Tab**：工具改为 2 列网格，议程入口全宽主卡片；Hero 加大留白。
+- **官员 Tab**：快捷操作图标底衬、职责与名单行距优化，首卡与 Hero 叠层衔接。
+- **议程搭建**：积木卡片启用/禁用态区分；底部固定四键操作栏（草稿/云端/导出/转发），移除悬浮按钮。
+- **主持稿 / 角色介绍**：增加 Hero 头图；Tab 改为胶囊分段控件。
+- **时间牌**：圆角与按钮间距微调。
+- **会员 Tab**：稿件列表与入口卡片阴影统一，去掉多余分割线。
+
+### 53. 路径体系 L→G 重写（对齐 G1/G2/G3 手册 V5） (2026-07-11)
+- **来源**：`路径手册/` 下 G1 A5V5、G2 A5V5、G3 A5V3（20260711）三份 Word。
+- **核心变更**：沟通力路径代号由 L1/L2/L3 全面改为 **G1/G2/G3**（手册说明：L 预留给领导力路径开发中）。
+- **结构**：必修/选修项目、时长、要求与手册路径表一致（18 条路径、19 门课程）；内容本身手册注明未改，仅改代号。
+- **文案**：手册导读前言、各阶结语补充 V5/V3「L→G」说明；导师认证对齐 G3 见习/导师/资深导师要求与权益。
+- **数据迁移**：`utils/learning/migrateIds.js`，App 启动时自动迁移本地课程进度、路径进度、提交记录、会员等级中的旧 L* ID。
+- **涉及**：`pathStructure.js`、`pathIntro.js`、`l1/l2/l3Courses.js`、`courseDraft.js`、`memberLevel.js`、`learningData.js`、learn/cert 相关页面。
+
+### 54. 去掉官员 Tab + 角色稿/自定义时间牌/运营 AI 主题 (2026-07-11)
+- **TabBar**：会员 / 角色 / **运营**（移除官员运营 Tab；`pages/officer` 保留但不挂 Tab）。
+- **角色稿**：角色介绍可点击；9 类角色均含「亮相串词 + 结束报告」填空模板（`roleScripts.js`）；主持稿页横向切换角色。
+- **时间牌**：支持自定义总时长与绿/黄牌剩余秒数规则，本地保存 `user_timer_rules`；红牌=0。
+- **运营工具**：新增 `pages/ops/home`、`pages/ops/theme`；主题灵感调用混元 AI（`AiService.generateThemeIdeas`），支持复制与「用于议程」预填主题。

@@ -1,0 +1,154 @@
+<!-- 单页议程搭建：基本信息 + 预设 + 积木表格 + 官员 + 预览 + 操作 -->
+<scroll-view scroll-y class="page" scroll-into-view="{{scrollTo}}">
+  <!-- 预设选择 -->
+  <view class="section">
+    <view class="section-head">
+      <view class="section-accent"></view>
+      <text class="section-title">会议类型</text>
+    </view>
+    <scroll-view scroll-x class="preset-scroll">
+      <view
+        class="preset-chip {{activePreset === item.id ? 'active' : ''}}"
+        wx:for="{{presets}}"
+        wx:key="id"
+        bindtap="onPresetTap"
+        data-id="{{item.id}}"
+      >{{item.name}}</view>
+    </scroll-view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="section">
+    <view class="section-head">
+      <view class="section-accent"></view>
+      <text class="section-title">会议信息</text>
+    </view>
+    <view class="form-row">
+      <text class="label">第几次</text>
+      <input class="input" value="{{agenda.meetingNo}}" data-field="meetingNo" bindinput="onMetaInput" placeholder="681" />
+    </view>
+    <view class="form-row">
+      <text class="label">主题</text>
+      <input class="input" value="{{agenda.theme}}" data-field="theme" bindinput="onMetaInput" placeholder="会议主题" />
+    </view>
+    <view class="form-row">
+      <text class="label">主题词</text>
+      <input class="input" value="{{agenda.themeWords}}" data-field="themeWords" bindinput="onMetaInput" />
+    </view>
+    <view class="form-row">
+      <text class="label">日期</text>
+      <input class="input" value="{{agenda.meetingDate}}" data-field="meetingDate" bindinput="onMetaInput" placeholder="2026年4月17日周五19:30-21:30" />
+    </view>
+    <view class="form-row">
+      <text class="label">地点</text>
+      <input class="input" value="{{agenda.location}}" data-field="location" bindinput="onMetaInput" />
+    </view>
+    <view class="form-row">
+      <text class="label">签到开始</text>
+      <input class="input" value="{{agenda.receptionStart}}" data-field="receptionStart" bindinput="onMetaInput" placeholder="19:20" />
+    </view>
+  </view>
+
+  <!-- 环节积木 -->
+  <view class="section">
+    <view class="section-head">
+      <view class="section-accent"></view>
+      <text class="section-title">流程积木</text>
+    </view>
+    <view class="block-card {{item.enabled ? 'on' : 'off'}}" wx:for="{{agenda.blocks}}" wx:key="id">
+      <view class="block-head">
+        <switch checked="{{item.enabled}}" bindchange="onBlockToggle" data-index="{{index}}" color="#ff9500" />
+        <text class="block-type">{{item.label}}</text>
+        <text class="block-time" wx:if="{{item.timeRange}}">{{item.timeRange}}</text>
+        <text class="block-del" bindtap="onRemoveBlock" data-index="{{index}}" wx:if="{{!item.type.endsWith('_section')}}">删除</text>
+      </view>
+      <view class="block-fields" wx:if="{{item.enabled && !item.type.endsWith('_section')}}">
+        <view class="field-row" wx:if="{{item.title !== undefined}}">
+          <text class="f-label">题目</text>
+          <input class="f-input" value="{{item.title}}" data-index="{{index}}" data-field="title" bindinput="onBlockInput" />
+        </view>
+        <view class="field-row">
+          <text class="f-label">路径码</text>
+          <input class="f-input" value="{{item.pathCode}}" data-index="{{index}}" data-field="pathCode" bindinput="onBlockInput" placeholder="G1V1-1" />
+        </view>
+        <view class="field-row">
+          <text class="f-label">角色</text>
+          <input class="f-input" value="{{item.role}}" data-index="{{index}}" data-field="role" bindinput="onBlockInput" />
+        </view>
+        <view class="field-row">
+          <text class="f-label">姓名</text>
+          <input class="f-input" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="onBlockInput" />
+        </view>
+        <view class="field-row">
+          <text class="f-label">时长(分)</text>
+          <input class="f-input" type="number" value="{{item.duration}}" data-index="{{index}}" data-field="duration" bindinput="onBlockInput" />
+        </view>
+        <view class="field-row">
+          <text class="f-label">时长说明</text>
+          <input class="f-input" value="{{item.durationText}}" data-index="{{index}}" data-field="durationText" bindinput="onBlockInput" placeholder="2-3'" />
+        </view>
+      </view>
+    </view>
+    <view class="add-bar">
+      <view class="add-chip" wx:for="{{addBlockTypes}}" wx:key="type" bindtap="onAddBlock" data-type="{{item.type}}">+ {{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- 官员名单 -->
+  <view class="section">
+    <view class="section-head">
+      <view class="section-accent"></view>
+      <text class="section-title">官员名单</text>
+    </view>
+    <view class="officer-edit" wx:for="{{agenda.officers}}" wx:key="title">
+      <input class="o-input" value="{{item.title}}" data-index="{{index}}" data-field="title" bindinput="onOfficerInput" placeholder="职位" />
+      <input class="o-input" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="onOfficerInput" placeholder="姓名" />
+      <input class="o-input wide" value="{{item.phone}}" data-index="{{index}}" data-field="phone" bindinput="onOfficerInput" placeholder="电话" />
+    </view>
+  </view>
+
+  <!-- 预览 -->
+  <view class="section preview-section" id="preview">
+    <view class="preview-head" bindtap="onTogglePreview">
+      <view class="section-head">
+        <view class="section-accent"></view>
+        <text class="section-title">议程预览</text>
+      </view>
+      <text class="toggle">{{showPreview ? '收起' : '展开'}}</text>
+    </view>
+    <view wx:if="{{showPreview}}">
+      <view class="preview-meta">
+        <text>第{{agenda.meetingNo}}次 · {{agenda.theme}} · {{agenda.meetingDate}}</text>
+        <text>{{agenda.location}}</text>
+      </view>
+      <view class="preview-table">
+        <view class="p-row head">
+          <text class="p-time">时间</text>
+          <text class="p-flow">流程</text>
+          <text class="p-role">角色</text>
+          <text class="p-name">姓名</text>
+        </view>
+        <block wx:for="{{previewRows}}" wx:key="index">
+          <view class="p-section" wx:if="{{item.kind === 'section'}}">{{item.text}}</view>
+          <view class="p-row" wx:else>
+            <text class="p-time">{{item.time}}</text>
+            <text class="p-flow">{{item.flow}}{{item.pathCode ? ' ' + item.pathCode : ''}}</text>
+            <text class="p-role">{{item.role}}</text>
+            <text class="p-name">{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-tip">先「云端分享」保存，再点「转发」协作填写</view>
+  <view class="safe-bottom"></view>
+</scroll-view>
+
+<!-- 底部固定操作栏 -->
+<view class="footer-bar">
+  <button class="bar-btn" bindtap="onSaveLocal">草稿</button>
+  <button class="bar-btn primary" bindtap="onSaveCloud">云端分享</button>
+  <button class="bar-btn" bindtap="onExportExcel">导出</button>
+  <button class="bar-btn share" open-type="share">转发</button>
+</view>

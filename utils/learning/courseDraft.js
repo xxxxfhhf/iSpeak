@@ -6,25 +6,25 @@ const { createProjectFromTemplate } = require('../draftFactory.js');
 
 /** courseId → 推荐模板（与手册路径演练要求对齐） */
 const COURSE_TEMPLATE_MAP = {
-  'L1V1-COURSE': { templateId: 'prep', draftTitle: '自我介绍演讲稿' },
-  'L1V2-COURSE': { templateId: 'total_split_total', draftTitle: '主题演讲稿' },
-  'L1V3-COURSE': { templateId: 'hero_journey', draftTitle: '破冰故事演讲稿' },
-  'L1V4-COURSE': { templateId: 'sandwich', draftTitle: '点评反馈稿' },
-  'L1X1-COURSE': { templateId: 'total_split_total', draftTitle: '开场技巧演讲稿' },
-  'L1X2-COURSE': { templateId: 'total_split_total', draftTitle: '正文技巧演讲稿' },
-  'L1X3-COURSE': { templateId: 'total_split_total', draftTitle: '结尾技巧演讲稿' },
-  'L2V1-C1': { templateId: 'total_split_total', draftTitle: '语调节奏演讲稿' },
-  'L2V1-C2': { templateId: 'total_split_total', draftTitle: '舞台呈现演讲稿' },
-  'L2V2-COURSE': { templateId: 'golden_circle', draftTitle: '阅读分享演讲稿' },
-  'L2X1-C1': { templateId: 'total_split_total', draftTitle: '有效倾听分享稿' },
-  'L2X1-C2': { templateId: 'scqa', draftTitle: 'PPT 学习分享稿' },
-  'L3V1-COURSE': { templateId: 'prep', draftTitle: '幽默演讲稿' },
-  'L3V2-COURSE': { templateId: 'prep', draftTitle: '说服性演讲稿' },
-  'L3V3-COURSE': { templateId: 'scqa', draftTitle: '职场汇报演讲稿' },
-  'L3X1-COURSE': { templateId: 'ops', draftTitle: '工作坊备稿' },
-  'L3X2-COURSE': { templateId: 'prep', draftTitle: '提问技巧演讲稿' },
-  'L3X3-C1': { templateId: 'prep', draftTitle: '沟通风格演讲稿' },
-  'L3X3-C2': { templateId: 'hero_journey', draftTitle: '沟通故事演讲稿' }
+  'G1V1-COURSE': { templateId: 'prep', draftTitle: '自我介绍演讲稿' },
+  'G1V2-COURSE': { templateId: 'total_split_total', draftTitle: '主题演讲稿' },
+  'G1V3-COURSE': { templateId: 'hero_journey', draftTitle: '破冰故事演讲稿' },
+  'G1V4-COURSE': { templateId: 'sandwich', draftTitle: '点评反馈稿' },
+  'G1X1-COURSE': { templateId: 'total_split_total', draftTitle: '开场技巧演讲稿' },
+  'G1X2-COURSE': { templateId: 'total_split_total', draftTitle: '正文技巧演讲稿' },
+  'G1X3-COURSE': { templateId: 'total_split_total', draftTitle: '结尾技巧演讲稿' },
+  'G2V1-C1': { templateId: 'total_split_total', draftTitle: '语调节奏演讲稿' },
+  'G2V1-C2': { templateId: 'total_split_total', draftTitle: '舞台呈现演讲稿' },
+  'G2V2-COURSE': { templateId: 'golden_circle', draftTitle: '阅读分享演讲稿' },
+  'G2X1-C1': { templateId: 'total_split_total', draftTitle: '有效倾听分享稿' },
+  'G2X1-C2': { templateId: 'scqa', draftTitle: 'PPT 学习分享稿' },
+  'G3V1-COURSE': { templateId: 'prep', draftTitle: '幽默演讲稿' },
+  'G3V2-COURSE': { templateId: 'prep', draftTitle: '说服性演讲稿' },
+  'G3V3-COURSE': { templateId: 'scqa', draftTitle: '职场汇报演讲稿' },
+  'G3X1-COURSE': { templateId: 'ops', draftTitle: '工作坊备稿' },
+  'G3X2-COURSE': { templateId: 'prep', draftTitle: '提问技巧演讲稿' },
+  'G3X3-C1': { templateId: 'prep', draftTitle: '沟通风格演讲稿' },
+  'G3X3-C2': { templateId: 'hero_journey', draftTitle: '沟通故事演讲稿' }
 };
 
 const DEFAULT_CONFIG = { templateId: 'total_split_total', draftTitle: '路径演练演讲稿' };

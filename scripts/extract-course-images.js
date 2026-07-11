@@ -13,14 +13,14 @@ const OUT_DIR = path.join(ROOT, 'assets', 'learning');
 /** 需导出的课程与 PDF 源文件 */
 const JOBS = [
   {
-    courseId: 'L2X1-C2',
+    courseId: 'G2X1-C2',
     pdf: 'L2演讲晋级手册_A5V4.pdf',
     // PDF 页码从 1 起，PPT 章节配图约在 30-36 页（按实际 PDF 调整）
     pages: [30, 31, 32, 33, 34, 35, 36, 37, 38, 40],
     names: ['fig1', 'fig2', 'fig3', 'fig4', 'fig5', 'fig6', 'fig7', 'fig8', 'fig9', 'fig11']
   },
   {
-    courseId: 'L3X3-C1',
+    courseId: 'G3X3-C1',
     pdf: 'L3演讲晋级手册_A5-2（20251228）.pdf',
     pages: [28],
     names: ['fig1']

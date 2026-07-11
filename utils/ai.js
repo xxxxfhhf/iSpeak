@@ -113,7 +113,19 @@ const SYSTEM_PROMPTS = {
   { "index": 0, "content": "生成的第一段内容..." },
   { "index": 1, "content": "生成的第二段内容..." }
 ]
-`
+`,
+
+  theme: `你是厦门演讲俱乐部的会议策划顾问，擅长为中文演讲例会设计有感染力的会议主题。
+
+【任务】根据用户给出的场合与关键词，生成 6 条会议主题灵感。
+
+【要求】
+1. 主题简洁有力，适合作为例会主题横幅（8~20 字为宜）。
+2. 风格多样：励志、成长、职场、生活、幽默、行动号召各有覆盖。
+3. 贴合演讲俱乐部场景，避免广告与敏感内容。
+4. 每条附一句 15 字内的简短说明（为何适合）。
+5. 严格输出 JSON，不要 Markdown 代码块：
+{"themes":[{"title":"主题名","reason":"简短说明"}]}`
 };
 
 const AiService = {
@@ -313,6 +325,33 @@ ${card.content || '(内容为空，请给出该环节的案例或模版)'}`;
       console.error('解析生成结果失败', e);
       return [];
     }
+  },
+
+  /**
+   * 会议主题灵感（运营工具）— 调用混元 AI
+   * @param {String} occasion 场合，如例会/工作坊
+   * @param {String} keyword 关键词
+   * @param {Function} onTextCallback 流式回调（可选）
+   * @returns {Promise<Array<{title:string,reason:string}>>}
+   */
+  async generateThemeIdeas(occasion, keyword, onTextCallback) {
+    const prompt = SYSTEM_PROMPTS.theme;
+    const content = `【场合】${occasion || '俱乐部例会'}\n【关键词】${keyword || '成长、表达'}\n请直接输出 JSON。`;
+    const result = await this.callDeepSeek(prompt, content, onTextCallback);
+    try {
+      const jsonStr = result.replace(/```json/g, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(jsonStr);
+      const list = (parsed.themes || []).filter(t => t && t.title);
+      if (list.length) return list;
+    } catch (e) {
+      console.error('解析主题灵感失败', e);
+    }
+    // 降级：按行拆分非空文本
+    return result.split('\n')
+      .map(l => l.replace(/^[\d\.\-\*、]+\s*/, '').trim())
+      .filter(l => l.length >= 4 && l.length <= 40)
+      .slice(0, 6)
+      .map(title => ({ title, reason: 'AI 生成' }));
   }
 };
 

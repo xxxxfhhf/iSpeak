@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/history/history",
+    "pages/role/home/home",
+    "pages/ops/home/home",
     "pages/index/index",
     "pages/preview/preview",
     "pages/mentor/mentor",
@@ -19,13 +21,45 @@
     "pages/cert/checklist/checklist",
     "pages/cert/workshop/workshop",
     "pages/cert/result/result",
-    "pages/club/follow/follow"
+    "pages/club/follow/follow",
+    "pages/role/agenda/edit/edit",
+    "pages/role/timer/timer",
+    "pages/role/script/script",
+    "pages/role/roleIntro/roleIntro",
+    "pages/ops/theme/theme",
+    "pages/officer/home/home"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "AI 演讲积木",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#007aff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/history/history",
+        "text": "会员",
+        "iconPath": "assets/tab/member.png",
+        "selectedIconPath": "assets/tab/member-active.png"
+      },
+      {
+        "pagePath": "pages/role/home/home",
+        "text": "角色",
+        "iconPath": "assets/tab/role.png",
+        "selectedIconPath": "assets/tab/role-active.png"
+      },
+      {
+        "pagePath": "pages/ops/home/home",
+        "text": "运营",
+        "iconPath": "assets/tab/ops.png",
+        "selectedIconPath": "assets/tab/ops-active.png"
+      }
+    ]
   },
   "sitemapLocation": "sitemap.json",
   "cloud": true,

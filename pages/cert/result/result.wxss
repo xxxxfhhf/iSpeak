@@ -1,7 +1,14 @@
-.container { min-height: 100vh; background: #f5f7fa; padding: 40rpx 24rpx; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-.result-card { background: #fff; border-radius: 20rpx; padding: 60rpx 40rpx; text-align: center; width: 100%; box-sizing: border-box; }
-.result-card.success { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
-.icon { font-size: 80rpx; display: block; }
-.title { font-size: 36rpx; font-weight: bold; display: block; margin-top: 20rpx; }
-.desc { font-size: 26rpx; margin-top: 12rpx; display: block; opacity: 0.8; }
-.btn { margin-top: 40rpx; background: #667eea; color: #fff; border-radius: 40rpx; width: 80%; }
+.container { min-height: 100vh; background: #f5f7fa; padding: 40rpx 24rpx; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+
+.result-card { background: #fff; border-radius: 20rpx; padding: 60rpx 40rpx; text-align: center; width: 100%; box-sizing: border-box; }
+
+.result-card.success { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+
+.icon { font-size: 80rpx; display: block; }
+
+.title { font-size: 36rpx; font-weight: bold; display: block; margin-top: 20rpx; }
+
+.desc { font-size: 26rpx; margin-top: 12rpx; display: block; opacity: 0.8; }
+
+.btn { margin-top: 40rpx; background: #667eea; color: #fff; border-radius: 40rpx; width: 80%; }
+
