@@ -1,0 +1,22 @@
+<view class="page">
+  <view wx:if="{{groups.length === 0 && !loading && !error}}" class="tip">暂无历史素材</view>
+
+  <view wx:if="{{error}}" class="tip error">{{error}}</view>
+
+  <block wx:for="{{groups}}" wx:key="month" wx:for-item="group">
+    <view class="month">{{group.month}}</view>
+    <view class="day" wx:for="{{group.days}}" wx:key="date" wx:for-item="day"
+          data-date="{{day.date}}" bindtap="onTapDay">
+      <view class="day-left">
+        <text class="day-date">{{day.date}}</text>
+        <text class="day-preview" wx:if="{{day.preview}}">{{day.preview}}</text>
+      </view>
+      <view class="day-tags">
+        <text class="mini-tag" wx:for="{{day.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+  <view wx:elif="{{loadedAll && groups.length > 0}}" class="tip">— 已加载全部 —</view>
+</view>

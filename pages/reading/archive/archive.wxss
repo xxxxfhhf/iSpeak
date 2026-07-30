@@ -1,0 +1,70 @@
+.page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding: 24rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.tip {
+  padding: 60rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+}
+.tip.error {
+  color: #e54d42;
+}
+
+.month {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #666;
+  margin: 32rpx 8rpx 16rpx;
+}
+
+.day {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.day:active {
+  background: #f0f0f0;
+}
+
+.day-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.day-date {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.day-preview {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.day-tags {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  display: flex;
+  gap: 8rpx;
+}
+.mini-tag {
+  font-size: 20rpx;
+  color: #007aff;
+  background: rgba(0, 122, 255, 0.08);
+  padding: 4rpx 12rpx;
+  border-radius: 16rpx;
+}

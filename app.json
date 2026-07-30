@@ -4,6 +4,8 @@
     "pages/role/home/home",
     "pages/ops/home/home",
     "pages/index/index",
+    "pages/reading/daily/daily",
+    "pages/reading/archive/archive",
     "pages/preview/preview",
     "pages/mentor/mentor",
     "pages/wizard/wizard",

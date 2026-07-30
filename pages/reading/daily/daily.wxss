@@ -1,0 +1,116 @@
+.page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding: 24rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 24rpx;
+}
+.header .title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.header .date {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+.header .archive-link {
+  margin-left: auto;
+  font-size: 26rpx;
+  color: #007aff;
+}
+.header .refresh {
+  margin-left: 24rpx;
+  font-size: 26rpx;
+  color: #007aff;
+}
+
+.tip {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+.tip.error {
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.btn, .regen {
+  display: inline-block;
+  padding: 16rpx 40rpx;
+  background: #007aff;
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+.regen {
+  display: block;
+  text-align: center;
+  margin: 20rpx auto 0;
+  width: 60%;
+  background: #fff;
+  color: #007aff;
+  border: 1rpx solid #007aff;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  color: #fff;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+.tag-poem { background: #ff9f43; }
+.tag-quote_cn { background: #007aff; }
+.tag-quote_en { background: #5f27cd; }
+.tag-story { background: #10ac84; }
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.card-body {
+  display: block;
+  font-size: 32rpx;
+  line-height: 1.9;
+  color: #333;
+  white-space: pre-wrap;
+}
+.card-foot {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+}
+.meta {
+  font-size: 24rpx;
+  color: #999;
+}
+.copy {
+  margin-left: auto;
+  font-size: 26rpx;
+  color: #007aff;
+}

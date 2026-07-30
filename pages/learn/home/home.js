@@ -46,6 +46,10 @@ Page({
     this.setData({ activeTab: 'guide' });
   },
 
+  onGoDaily() {
+    wx.navigateTo({ url: '/pages/reading/daily/daily' });
+  },
+
   loadHandbookIntro() {
     const handbook = LearningData.getHandbookIntro() || {};
     const memberBenefits = LearningData.getMemberBenefits() || [];
