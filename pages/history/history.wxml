@@ -40,7 +40,7 @@
 
   <scroll-view scroll-y class="home-scroll">
   <view class="dashboard">
-    <view class="dashboard-heading">每一次表达，向前一步</view>
+    <view class="voice-entry" bindtap="onVoiceCoach" hover-class="card-pressed"><text class="voice-title">说出想法，AI 陪你成稿</text><text class="voice-sub">语音输入 · 一步步引导 · 整理成稿</text><text class="voice-button">开始语音备稿 →</text></view><view class="dashboard-heading">每一次表达，向前一步</view>
     <view class="continue-card" hover-class="card-pressed" bindtap="onContinueDraft">
       <text class="dashboard-label">{{recentProject ? '继续准备' : '准备你的第一次演讲'}}</text>
       <text class="dashboard-title">{{recentProject ? recentProject.title : '从一个想表达的观点开始'}}</text>

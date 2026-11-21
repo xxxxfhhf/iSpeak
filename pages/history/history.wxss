@@ -462,3 +462,5 @@
 .nav-btn { height: auto; }
 .menu-item { min-height: 52px; }
 .card-pressed { opacity: .82; }
+
+.voice-entry{padding:32rpx;background:#174da6;border-radius:24rpx;color:white;margin-bottom:28rpx}.voice-title,.voice-sub,.voice-button{display:block}.voice-title{font-size:36rpx;font-weight:600}.voice-sub{font-size:26rpx;margin-top:14rpx}.voice-button{font-size:30rpx;padding:24rpx 0 8rpx}

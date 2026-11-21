@@ -143,6 +143,8 @@ Page({
     openOfficialAccount();
   },
 
+  onVoiceCoach() { wx.navigateTo({url:'/pages/coach/coach'}); },
+
   onNewAiWizard() {
     this.closeNewMenu();
     wx.navigateTo({

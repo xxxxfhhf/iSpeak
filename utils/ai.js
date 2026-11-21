@@ -140,70 +140,9 @@ const AiService = {
    * @returns {Promise<String>} 返回 AI 生成的完整文本内容
    */
   async callDeepSeek(prompt, content, onTextCallback) {
-    // 检查小程序基础库版本，确保支持 AI 能力
-    // wx.cloud.extend.AI 是微信小程序基础库 3.7.1+ 才提供的 API
-    // 如果不存在，说明基础库版本过低，无法使用 AI 功能
-    if (!wx.cloud || !wx.cloud.extend || !wx.cloud.extend.AI) {
-      throw new Error('当前基础库版本过低，请使用 3.7.1 或以上版本以使用 AI 能力');
-    }
-
-    try {
-    
-      const model = wx.cloud.extend.AI.createModel("hunyuan-exp");
-      
-      // 调用流式文本生成 API
-      // streamText 方法会以流式（SSE）方式返回 AI 生成的文本
-      // 相比同步调用，流式调用可以实时显示生成过程，用户体验更好
-      console.log("prompt", prompt);
-      console.log("content", content);
-      console.log("onTextCallback", onTextCallback);
-      const res = await model.streamText({
-        data: {
-          // 指定使用的具体模型版本
-          // "hunyuan-turbos-latest" 是腾讯混元最新版本的快速模型
-          // 速度快、响应及时，适合实时交互场景
-          model: "hunyuan-turbos-latest",
-          // 消息数组，遵循 OpenAI 格式的对话结构
-          messages: [
-            // system 消息：定义 AI 的角色和行为准则
-            // 这里的 prompt 通常是预定义的系统提示词（如：演讲教练、口语化改写等）
-            { role: "system", content: prompt },
-            // user 消息：用户的实际输入内容
-            // 这里的 content 是需要 AI 处理的文本（如：卡片内容、项目背景等）
-            { role: "user", content: content }
-          ],
-          
-          // temperature 参数：控制 AI 生成的随机性和创造性
-          // 取值范围：0.0 - 1.0
-          // 0.7 是一个平衡值：
-          //   - 较低值（如 0.3）：更保守、更可预测，适合需要准确性的场景
-          //   - 较高值（如 0.9）：更创新、更多样化，但可能不够稳定
-          //   0.7 在创造性和稳定性之间取得平衡，适合演讲内容生成
-          temperature: 0.7
-        }
-      });
-
-      // 遍历 textStream 收集完整的文本流
-      let fullText = '';
-      for await (let text of res.textStream) {
-        fullText += text;
-        if (onTextCallback && typeof onTextCallback === 'function') {
-          onTextCallback(fullText);
-        }
-      }
-
-      console.log("AI 生成完成，内容长度：", fullText.length);
-      return fullText;
-    } catch (err) {
-      console.error('AI 调用失败：', err);
-      
-      // 401 错误特殊处理
-      if (err.errMsg && err.errMsg.includes('401')) {
-        throw new Error('AI 服务认证失败。请检查：\n1. 云开发控制台是否已开启 AI 服务\n2. 是否已配置混元模型权限\n3. 环境 ID 是否正确');
-      }
-      
-      throw new Error(err.message || err.errMsg || 'AI 请求失败，请检查网络或配置');
-    }
+    const result = await require('./speechAI')({action: 'generate', prompt, messages: [{role: 'user', content}]});
+    if (onTextCallback) onTextCallback(result.text);
+    return result.text;
   },
 
   /**

@@ -29,7 +29,9 @@
     "pages/role/script/script",
     "pages/role/roleIntro/roleIntro",
     "pages/ops/theme/theme",
-    "pages/officer/home/home"
+    "pages/officer/home/home",
+    "pages/coach/coach",
+    "pages/knowledge/knowledge"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -65,5 +67,10 @@
   },
   "sitemapLocation": "sitemap.json",
   "cloud": true,
-  "requiredBackgroundModes": []
+  "requiredBackgroundModes": [],
+  "permission": {
+    "scope.record": {
+      "desc": "用于将口述想法识别成文字，辅助演讲备稿"
+    }
+  }
 }
