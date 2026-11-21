@@ -156,3 +156,5 @@
 .dur { min-height: 48px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
 .btns button { min-height: 52px; }
 .tip { color: #c1c6cd; }
+
+.summary-line { display: block; }

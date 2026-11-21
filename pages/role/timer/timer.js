@@ -1,175 +1,49 @@
-/**
- * 时间牌 — 支持自定义总时长与绿/黄/红触发规则（按剩余秒数）
- * 规则本地保存：user_timer_rules
- */
-const RULES_KEY = 'user_timer_rules';
-
-const DEFAULT_RULES = {
-  totalSec: 180,
-  greenSec: 60,
-  yellowSec: 30
-};
-
+const RULES_KEY = 'user_timer_rules_v2';
 Page({
-  data: {
-    totalMinLabel: '3',
-    yellowMinLabel: '0.5',
-    totalMin: 3,
-    totalSecPart: 0,
-    greenSec: 60,
-    yellowSec: 30,
-    totalSec: 180,
-    remainSec: 180,
-    card: 'green',
-    running: false,
-    timerId: null,
-    timeStr: '3:00',
-    showCustom: false,
-    presets: [2, 3, 5, 7]
-  },
-
-  onLoad() {
-    this.loadRules();
-  },
-
-  onUnload() {
-    this.stopTimer();
-  },
-
-  /** 读取本地自定义规则 */
-  loadRules() {
-    const saved = wx.getStorageSync(RULES_KEY) || {};
-    const rules = { ...DEFAULT_RULES, ...saved };
-    const totalMin = Math.floor(rules.totalSec / 60);
-    const totalSecPart = rules.totalSec % 60;
-    this.applyRules(rules.totalSec, rules.greenSec, rules.yellowSec, false);
-    this.setData({ totalMin, totalSecPart, greenSec: rules.greenSec, yellowSec: rules.yellowSec });
-  },
-
-  applyRules(totalSec, greenSec, yellowSec, resetRunning) {
-    const safeTotal = Math.max(10, Number(totalSec) || 180);
-    let g = Math.max(0, Number(greenSec) || 0);
-    let y = Math.max(0, Number(yellowSec) || 0);
-    if (g > safeTotal) g = safeTotal;
-    if (y > g) y = g;
-    this.stopTimer();
-    this.setData({
-      totalMinLabel: String(Number((safeTotal / 60).toFixed(2))),
-      yellowMinLabel: String(Number((y / 60).toFixed(2))),
-      totalSec: safeTotal,
-      greenSec: g,
-      yellowSec: y,
-      remainSec: safeTotal,
-      card: 'green',
-      timeStr: this._fmt(safeTotal),
-      running: false,
-      totalMin: Math.floor(safeTotal / 60),
-      totalSecPart: safeTotal % 60
-    });
-    if (resetRunning === false) return;
-  },
-
-  _fmt(sec) {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  },
-
-  onToggleCustom() {
-    this.setData({ showCustom: !this.data.showCustom });
-  },
-
-  onSetDuration(e) {
-    const min = parseInt(e.currentTarget.dataset.min, 10);
-    const totalSec = min * 60;
-    // 预设：绿=总时长1/3，黄=总时长1/6（至少 15 秒）
-    const greenSec = Math.max(30, Math.floor(totalSec / 3));
-    const yellowSec = Math.max(15, Math.floor(totalSec / 6));
-    this.applyRules(totalSec, greenSec, yellowSec);
-  },
-
-  onInputMin(e) {
-    this.setData({ totalMin: parseInt(e.detail.value, 10) || 0 });
-  },
-
-  onInputSecPart(e) {
-    this.setData({ totalSecPart: parseInt(e.detail.value, 10) || 0 });
-  },
-
-  onInputGreen(e) {
-    this.setData({ greenSec: parseInt(e.detail.value, 10) || 0 });
-  },
-
-  onInputYellowMin(e) {
-    this.setData({ yellowSec: Math.round((Number(e.detail.value) || 0) * 60) });
-  },
-
-  onInputYellow(e) {
-    this.setData({ yellowSec: parseInt(e.detail.value, 10) || 0 });
-  },
-
-  /** 保存并应用自定义规则 */
-  onSaveRules() {
-    let { totalMin, totalSecPart, greenSec, yellowSec } = this.data;
-    totalSecPart = Math.min(59, Math.max(0, totalSecPart));
-    const totalSec = Math.max(10, totalMin * 60 + totalSecPart);
-    greenSec = totalSec;
-    if (yellowSec <= 0 || yellowSec >= totalSec) {
-      wx.showToast({ title: '黄牌时长需大于0且小于总时长', icon: 'none' });
-      return;
-    }
-    if (greenSec > totalSec) {
-      wx.showToast({ title: '绿牌不能超过总时长', icon: 'none' });
-      return;
-    }
-    const rules = { totalSec, greenSec, yellowSec };
-    wx.setStorageSync(RULES_KEY, rules);
-    this.applyRules(totalSec, greenSec, yellowSec);
-    wx.showToast({ title: '规则已保存', icon: 'success' });
-  },
-
-  onStart() {
-    if (this.data.running) return;
-    const timerId = setInterval(() => this.tick(), 1000);
-    this.setData({ running: true, timerId, card: this.data.remainSec <= 0 ? 'red' : this.data.remainSec <= this.data.yellowSec ? 'yellow' : 'green' });
-  },
-
-  onPause() {
-    this.stopTimer();
-    this.setData({ running: false });
-  },
-
-  onReset() {
-    this.stopTimer();
-    this.setData({
-      running: false,
-      remainSec: this.data.totalSec,
-      card: 'green',
-      timeStr: this._fmt(this.data.totalSec)
-    });
-  },
-
-  stopTimer() {
-    if (this.data.timerId) clearInterval(this.data.timerId);
-    this.setData({ timerId: null });
-  },
-
-  /** 按自定义剩余秒数判定牌色 */
-  tick() {
-    let { remainSec, greenSec, yellowSec } = this.data;
-    if (remainSec <= 0) {
-      this.stopTimer();
-      this.setData({ running: false, card: 'red', remainSec: 0, timeStr: '0:00' });
-      wx.vibrateShort({ type: 'heavy' });
-      return;
-    }
-    remainSec -= 1;
-    const card = remainSec <= 0 ? 'red' : remainSec <= yellowSec ? 'yellow' : 'green';
-    this.setData({ remainSec, card, timeStr: this._fmt(remainSec) });
-    if (remainSec === 0) {
-      this.stopTimer();
-      this.setData({ running: false });
-      wx.vibrateShort({ type: 'heavy' });
-    }
+ data: { totalMin: 3, greenMin: 1, yellowMin: 0.5, bellMin: 0.5, totalSec: 180, greenSec: 60, yellowSec: 30, bellSec: 30, remainSec: 180, card: 'none', timeStr: '3:00', running: false, finished: false, showCustom: false, mode: 'standard', presets: [2,3,5,7] },
+ onLoad() {
+  this.audio = wx.createInnerAudioContext();
+  this.audio.src = '/assets/audio/timer-bell.wav';
+  this.audio.obeyMuteSwitch = false;
+  this.audio.onError(() => wx.showToast({ title: '铃声播放失败，请检查媒体音量', icon: 'none' }));
+  const saved = wx.getStorageSync(RULES_KEY);
+  if (saved && this.valid(saved)) this.apply(saved); else this.apply(this.standard(180));
+ },
+ onUnload() { this.stopTimer(); if (this.audio) this.audio.destroy(); wx.setKeepScreenOn({ keepScreenOn: false }); },
+ standard(totalSec) { return { totalSec, greenSec: totalSec <= 180 ? 60 : 120, yellowSec: totalSec <= 180 ? 30 : 60, bellSec: 30, mode: 'standard' }; },
+ valid(r) { return [r.totalSec,r.greenSec,r.yellowSec,r.bellSec].every(Number.isFinite) && r.totalSec > 0 && r.greenSec > r.yellowSec && r.yellowSec > 0 && r.bellSec > 0 && r.bellSec <= 3600 && (r.mode === 'standard' || r.greenSec <= r.totalSec); },
+ color(left) { return left <= 0 ? 'red' : left <= this.data.yellowSec ? 'yellow' : left <= this.data.greenSec ? 'green' : 'none'; },
+ fmt(sec) { const n = Math.abs(sec); return Math.floor(n/60) + ':' + String(n%60).padStart(2,'0'); },
+ apply(r) {
+  this.stopTimer(); if (this.audio) this.audio.stop();
+  this.setData({ ...r, totalMin: r.totalSec/60, greenMin: r.greenSec/60, yellowMin: r.yellowSec/60, bellMin: r.bellSec/60, remainSec: r.totalSec, running: false, finished: false, timeStr: this.fmt(r.totalSec) });
+  this.setData({ card: this.color(r.totalSec) });
+ },
+ onToggleCustom() { this.setData({ showCustom: !this.data.showCustom }); },
+ onInput(e) { this.setData({ [e.currentTarget.dataset.field]: e.detail.value }); },
+ onSetDuration(e) { const r = this.standard(Number(e.currentTarget.dataset.min)*60); this.apply(r); wx.setStorageSync(RULES_KEY,r); },
+ onSaveRules() {
+  const r = { totalSec: Math.round(Number(this.data.totalMin)*60), greenSec: Math.round(Number(this.data.greenMin)*60), yellowSec: Math.round(Number(this.data.yellowMin)*60), bellSec: Math.round(Number(this.data.bellMin)*60), mode: 'custom' };
+  if (!this.valid(r)) { wx.showToast({ title: '需满足：总时长≥绿牌>黄牌>0，响铃延时为0–60 min之间', icon: 'none' }); return; }
+  this.apply(r); wx.setStorageSync(RULES_KEY,r); wx.showToast({ title: '自定义规则已保存' });
+ },
+ onStandard() { const total = Math.round(Number(this.data.totalMin)*60); if (!Number.isFinite(total) || total <= 0) return; const r=this.standard(total); this.apply(r); wx.setStorageSync(RULES_KEY,r); },
+ onStart() {
+  if (this.data.running || this.data.finished) return;
+  this.deadline = Date.now() + this.data.remainSec*1000;
+  this.setData({ running: true }); wx.setKeepScreenOn({ keepScreenOn: true });
+  this.timer = setInterval(() => this.tick(),200);
+ },
+ stopTimer() { if (this.timer) clearInterval(this.timer); this.timer=null; },
+ onPause() { if (this.data.running) this.tick(); this.stopTimer(); this.setData({ running: false }); wx.setKeepScreenOn({ keepScreenOn: false }); },
+ onReset() { const {totalSec,greenSec,yellowSec,bellSec,mode}=this.data; this.apply({totalSec,greenSec,yellowSec,bellSec,mode}); wx.setKeepScreenOn({ keepScreenOn: false }); },
+ tick() {
+  const left = Math.max(-this.data.bellSec,Math.ceil((this.deadline-Date.now())/1000));
+  this.setData({ remainSec: left, card: this.color(left), timeStr: this.fmt(left) });
+  if (left <= -this.data.bellSec && !this.data.finished) {
+   this.stopTimer(); this.setData({ running: false, finished: true });
+   if (this.audio) { this.audio.stop(); this.audio.play(); }
+   wx.vibrateLong(); wx.showModal({ title: '必须结束演讲', content: '已达到超时响铃时间，请立即结束演讲。', showCancel: false });
   }
+ }
 });
