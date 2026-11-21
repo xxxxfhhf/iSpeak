@@ -1,18 +1,9 @@
-<!-- 运营 Tab -->
 <scroll-view scroll-y class="page">
-  <view class="hero">
-    <text class="hero-title">运营工具</text>
-    <text class="hero-sub">会议策划小助手</text>
-  </view>
-
+  <view class="hero"><text class="hero-title">我的成长空间</text><text class="hero-sub">稿件与学习资料当前保存在本机，请保留重要材料副本</text></view>
   <view class="tool-list">
-    <view class="tool-card" bindtap="onTheme">
-      <text class="tool-icon">💡</text>
-      <view class="tool-text">
-        <text class="tool-name">主题灵感获取</text>
-        <text class="tool-desc">AI 生成例会主题候选 · 可复制到议程</text>
-      </view>
-      <text class="arrow">›</text>
-    </view>
+    <view class="tool-card" bindtap="open" data-url="/pages/learn/home/home"><view class="tool-text"><text class="tool-name">成长路径</text><text class="tool-desc">课程、演练与个人进度</text></view><text>›</text></view>
+    <view class="tool-card" bindtap="open" data-url="/pages/library/library"><view class="tool-text"><text class="tool-name">素材库</text><text class="tool-desc">保存故事与表达灵感</text></view><text>›</text></view>
+    <view class="tool-card" bindtap="open" data-url="/pages/cert/home/home"><view class="tool-text"><text class="tool-name">认证准备</text><text class="tool-desc">个人准备记录，正式结果以俱乐部确认为准</text></view><text>›</text></view>
+    <view class="tool-card" bindtap="open" data-url="/pages/club/follow/follow"><view class="tool-text"><text class="tool-name">俱乐部资讯</text><text class="tool-desc">关注公众号与活动消息</text></view><text>›</text></view>
   </view>
 </scroll-view>

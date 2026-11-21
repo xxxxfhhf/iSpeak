@@ -1,8 +1,8 @@
 <!-- 角色 Tab — 时间牌 / 角色介绍 / 主持稿 / 议程表 -->
 <scroll-view scroll-y class="page">
   <view class="hero">
-    <text class="hero-title">角色工具箱</text>
-    <text class="hero-sub">会议现场实用工具</text>
+    <text class="hero-title">例会工具</text>
+    <text class="hero-sub">会前策划 · 角色准备 · 现场计时</text>
   </view>
 
   <view class="tool-grid">
@@ -28,5 +28,6 @@
       <text class="tool-name">主持稿生成</text>
       <text class="tool-desc">总主持 / 即兴主持模板</text>
     </view>
+    <view class="tool-card" bindtap="onTheme"><text class="tool-name">主题灵感</text><text class="tool-desc">为下一场例会寻找主题</text></view>
   </view>
 </scroll-view>

@@ -1,4 +1,5 @@
 // pages/learn/path/path.js — 一条路径含多门课程 + 多个演练项目
+const Storage = require('../../../utils/storage');
 const LearningData = require('../../../utils/learningData');
 const { openOfficialAccount } = require('../../../utils/clubFollow.js');
 const MemberLevel = require('../../../utils/memberLevel.js');
@@ -40,9 +41,9 @@ Page({
       const prog = progressMap[key] || {};
       const isCompleted = !!(prog.hasSubmission && prog.isOfflinePassed);
       let statusText = '未开始';
-      if (isCompleted) statusText = '已完成';
-      else if (prog.hasSubmission) statusText = '待线下通过';
-      else if (prog.isOfflinePassed) statusText = '已线下通过';
+      if (isCompleted) statusText = '已完成（自记）';
+      else if (prog.hasSubmission) statusText = '待个人确认';
+      else if (prog.isOfflinePassed) statusText = '个人已确认';
       return { ...item, ...prog, isCompleted, statusText };
     };
 
@@ -93,6 +94,25 @@ Page({
     });
   },
 
+  onPrepare(e) {
+    if (!this.data.isUnlocked) return;
+    const item = this.data.taskItems.find(t => t.id === e.currentTarget.dataset.itemId);
+    if (!item) return;
+    let projectId = Storage.getProjects().find(p => {
+      const source = (Storage.getProject(p.id) || {}).learnSource;
+      return source && source.pathId === this.data.pathId && source.itemId === item.id;
+    });
+    projectId = projectId && projectId.id;
+    if (!projectId) {
+      projectId = Storage.createProject(item.project);
+      Storage.saveProjectData(projectId, { learnSource: {
+        pathId: this.data.pathId, itemId: item.id, pathCode: this.data.path.code,
+        requirement: item.requirement, duration: item.duration
+      } });
+    }
+    wx.navigateTo({ url: `/pages/index/index?id=${projectId}` });
+  },
+
   onMarkOffline(e) {
     if (!this.data.isUnlocked) return;
     const itemId = e.currentTarget.dataset.itemId;
@@ -104,8 +124,8 @@ Page({
       return;
     }
     wx.showModal({
-      title: '确认线下通过',
-      content: '确认该演练项目已在俱乐部线下完成并通过？',
+      title: '记录线下完成',
+      content: '此操作仅记录个人完成情况，不代表俱乐部正式审核。确认已在线下完成该项目？',
       success: (res) => {
         if (res.confirm) {
           progressMap[key] = { ...prog, isOfflinePassed: true, isCompleted: true, updatedAt: Date.now() };

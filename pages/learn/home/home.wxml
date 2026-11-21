@@ -31,7 +31,7 @@
           <!-- 会员等级：老会员按俱乐部评定选择 G1/G2/G3 -->
           <view class="member-level-bar">
             <view class="level-bar-top">
-              <text class="level-label">我的等级</text>
+              <text class="level-label">自报学习等级</text>
               <text class="level-current">{{memberLevelLabel}}</text>
             </view>
             <view class="level-tags">
@@ -43,7 +43,7 @@
                 data-level="{{item.id}}"
               >{{item.id}}</view>
             </view>
-            <text class="level-hint">按俱乐部评定选择等级，解锁对应阶段；新会员从 G1 开始</text>
+            <text class="level-hint">此选择用于个人学习安排，不代表正式评级；新会员从 G1 开始</text>
           </view>
 
           <view class="progress-section">

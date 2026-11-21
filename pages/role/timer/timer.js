@@ -12,13 +12,15 @@ const DEFAULT_RULES = {
 
 Page({
   data: {
+    totalMinLabel: '3',
+    yellowMinLabel: '0.5',
     totalMin: 3,
     totalSecPart: 0,
     greenSec: 60,
     yellowSec: 30,
     totalSec: 180,
     remainSec: 180,
-    card: 'none',
+    card: 'green',
     running: false,
     timerId: null,
     timeStr: '3:00',
@@ -52,11 +54,13 @@ Page({
     if (y > g) y = g;
     this.stopTimer();
     this.setData({
+      totalMinLabel: String(Number((safeTotal / 60).toFixed(2))),
+      yellowMinLabel: String(Number((y / 60).toFixed(2))),
       totalSec: safeTotal,
       greenSec: g,
       yellowSec: y,
       remainSec: safeTotal,
-      card: 'none',
+      card: 'green',
       timeStr: this._fmt(safeTotal),
       running: false,
       totalMin: Math.floor(safeTotal / 60),
@@ -96,6 +100,10 @@ Page({
     this.setData({ greenSec: parseInt(e.detail.value, 10) || 0 });
   },
 
+  onInputYellowMin(e) {
+    this.setData({ yellowSec: Math.round((Number(e.detail.value) || 0) * 60) });
+  },
+
   onInputYellow(e) {
     this.setData({ yellowSec: parseInt(e.detail.value, 10) || 0 });
   },
@@ -105,8 +113,9 @@ Page({
     let { totalMin, totalSecPart, greenSec, yellowSec } = this.data;
     totalSecPart = Math.min(59, Math.max(0, totalSecPart));
     const totalSec = Math.max(10, totalMin * 60 + totalSecPart);
-    if (greenSec < yellowSec) {
-      wx.showToast({ title: '绿牌秒数需≥黄牌', icon: 'none' });
+    greenSec = totalSec;
+    if (yellowSec <= 0 || yellowSec >= totalSec) {
+      wx.showToast({ title: '黄牌时长需大于0且小于总时长', icon: 'none' });
       return;
     }
     if (greenSec > totalSec) {
@@ -122,7 +131,7 @@ Page({
   onStart() {
     if (this.data.running) return;
     const timerId = setInterval(() => this.tick(), 1000);
-    this.setData({ running: true, timerId });
+    this.setData({ running: true, timerId, card: this.data.remainSec <= 0 ? 'red' : this.data.remainSec <= this.data.yellowSec ? 'yellow' : 'green' });
   },
 
   onPause() {
@@ -135,7 +144,7 @@ Page({
     this.setData({
       running: false,
       remainSec: this.data.totalSec,
-      card: 'none',
+      card: 'green',
       timeStr: this._fmt(this.data.totalSec)
     });
   },
@@ -155,10 +164,12 @@ Page({
       return;
     }
     remainSec -= 1;
-    let card = 'none';
-    if (remainSec <= 0) card = 'red';
-    else if (remainSec <= yellowSec) card = 'yellow';
-    else if (remainSec <= greenSec) card = 'green';
+    const card = remainSec <= 0 ? 'red' : remainSec <= yellowSec ? 'yellow' : 'green';
     this.setData({ remainSec, card, timeStr: this._fmt(remainSec) });
+    if (remainSec === 0) {
+      this.stopTimer();
+      this.setData({ running: false });
+      wx.vibrateShort({ type: 'heavy' });
+    }
   }
 });

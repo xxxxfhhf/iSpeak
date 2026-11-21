@@ -108,6 +108,7 @@ Page({
 
       this.setData({
         project: projectMeta,
+        learnSource: projectData.learnSource || null,
         cards,
         mentorSuggestions: pendingSuggestions,
         pendingSuggestionCount,

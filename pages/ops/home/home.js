@@ -1,5 +1,3 @@
 Page({
-  onTheme() {
-    wx.navigateTo({ url: '/pages/ops/theme/theme' });
-  }
+  open(e) { wx.navigateTo({ url: e.currentTarget.dataset.url }); }
 });

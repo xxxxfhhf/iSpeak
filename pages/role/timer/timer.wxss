@@ -144,3 +144,15 @@
 .btns button::after {
   border: none;
 }
+
+.page { height: 100vh; padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); }
+.card-display { min-height: 340rpx; }
+.card-green { background: #15824b; }
+.card-yellow { background: #f5c842; }
+.card-yellow .time,.card-yellow .card-label,.card-yellow .time-unit { color: #302700; }
+.time { font-size: 148rpx; }
+.time-unit { color: #fff; font-size: 26rpx; margin-top: 8rpx; }
+.rule-summary { color: #c1c6cd; font-size: 24rpx; line-height: 1.6; }
+.dur { min-height: 48px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.btns button { min-height: 52px; }
+.tip { color: #c1c6cd; }

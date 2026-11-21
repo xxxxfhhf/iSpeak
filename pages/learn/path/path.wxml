@@ -37,7 +37,7 @@
   <view class="section" wx:if="{{taskItems.length}}">
     <view class="section-head">
       <text class="section-title">🎤 线下演讲演练</text>
-      <text class="section-sub">提交资料 + 俱乐部线下通过</text>
+      <text class="section-sub">提交资料 + 个人记录线下完成；正式评定以俱乐部为准</text>
     </view>
     <view class="task-card speech-card" wx:for="{{taskItems}}" wx:key="id">
       <view class="card-top">
@@ -48,8 +48,9 @@
       <text class="req-text">{{item.requirement}}</text>
       <text class="time-text highlight" wx:if="{{item.duration}}">{{item.duration}}</text>
       <view class="row-actions">
+        <button class="mini-btn primary" bindtap="onPrepare" data-item-id="{{item.id}}" disabled="{{!isUnlocked}}">开始 / 继续备稿</button>
         <button class="mini-btn" bindtap="onSubmit" data-item-id="{{item.id}}" disabled="{{!isUnlocked}}">提交资料</button>
-        <button class="mini-btn outline" bindtap="onMarkOffline" data-item-id="{{item.id}}" disabled="{{!isUnlocked || !item.hasSubmission}}">线下通过</button>
+        <button class="mini-btn outline" bindtap="onMarkOffline" data-item-id="{{item.id}}" disabled="{{!isUnlocked || !item.hasSubmission}}">记录完成</button>
         <text class="status-tag {{item.isCompleted ? 'done' : ''}}">{{item.statusText}}</text>
       </view>
     </view>

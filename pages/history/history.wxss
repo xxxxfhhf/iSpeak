@@ -421,3 +421,44 @@
   color: #fff;
 }
 
+
+.dashboard { padding: 8rpx 28rpx 0; }
+.dashboard-heading { font-size: 36rpx; font-weight: 600; margin: 16rpx 0 24rpx; color: #182b49; }
+.continue-card { background: #165dce; color: #fff; border-radius: 24rpx; padding: 28rpx; }
+.dashboard-label,.dashboard-title,.dashboard-caption,.dashboard-action { display: block; }
+.dashboard-label { font-size: 24rpx; margin-bottom: 16rpx; }
+.dashboard-title { font-size: 32rpx; font-weight: 600; overflow-wrap: break-word; }
+.dashboard-caption { font-size: 24rpx; line-height: 1.6; margin-top: 12rpx; }
+.dashboard-action { font-size: 28rpx; margin-top: 20rpx; font-weight: 600; }
+.growth-card { background: #fff; padding: 24rpx; border-radius: 20rpx; margin-top: 16rpx; }
+.growth-card .dashboard-caption { color: #526175; }
+.growth-card .dashboard-action { color: #165dce; }
+.section-heading { font-size: 30rpx; font-weight: 600; margin: 24rpx 0 16rpx; }
+.project-list { flex: 1; min-height: 0; }
+
+/* Spacious home: one primary action, full-page scroll, generous touch targets. */
+.container { background: #f4f6fa; }
+.header { padding: 16rpx 32rpx; gap: 20rpx; }
+.search-box { min-width: 0; min-height: 48px; border-radius: 16rpx; padding: 0 24rpx; }
+.search-input { font-size: 28rpx; }
+.home-scroll { flex: 1; min-height: 0; height: 0; }
+.dashboard { padding: 16rpx 32rpx 0; }
+.dashboard-heading { font-size: 42rpx; line-height: 1.4; margin-bottom: 28rpx; letter-spacing: 1rpx; }
+.continue-card { min-height: 260rpx; box-sizing: border-box; padding: 36rpx; border-radius: 28rpx; background: #174da6; }
+.continue-card .dashboard-title { font-size: 40rpx; line-height: 1.4; }
+.continue-card .dashboard-action { display: inline-block; background: #fff; color: #174da6; border-radius: 14rpx; min-height: 48px; line-height: 48px; padding: 0 28rpx; margin-top: 28rpx; }
+.quick-actions { display: flex; gap: 20rpx; margin-top: 24rpx; }
+.quick-action { flex: 1; min-width: 0; background: #fff; padding: 28rpx 24rpx; border-radius: 22rpx; min-height: 120rpx; }
+.quick-title,.quick-desc { display: block; }
+.quick-title { font-size: 32rpx; font-weight: 600; color: #182b49; }
+.quick-desc { font-size: 26rpx; color: #65748a; margin-top: 14rpx; }
+.growth-card { margin-top: 24rpx; padding: 28rpx; }
+.section-heading { margin-top: 36rpx; }
+.project-list { height: auto; padding: 0 32rpx 40rpx; box-sizing: border-box; }
+.project-card { padding: 30rpx; min-height: 140rpx; border-radius: 22rpx; box-shadow: none; border: 1rpx solid #e7ebf2; }
+.project-title { font-size: 34rpx; }
+.more-btn { min-width: 48px; min-height: 48px; display: flex; align-items: center; justify-content: center; }
+.new-btn { min-height: 48px; line-height: 48px; box-sizing: border-box; padding: 0 24rpx; border-radius: 16rpx; box-shadow: none; }
+.nav-btn { height: auto; }
+.menu-item { min-height: 52px; }
+.card-pressed { opacity: .82; }

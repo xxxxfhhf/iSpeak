@@ -810,3 +810,6 @@
   padding: 8rpx 20rpx;
   border-radius: 20rpx;
 }
+
+.learning-context { background: #edf4ff; color: #204772; padding: 20rpx; border-radius: 16rpx; font-size: 24rpx; line-height: 1.6; }
+.learning-context text { display: block; }

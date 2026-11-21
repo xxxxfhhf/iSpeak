@@ -13,6 +13,7 @@
         </view>
       </view>
     </view>
+    <view class="learning-context" wx:if="{{learnSource}}"><text>关联任务：{{learnSource.pathCode}}</text><text>{{learnSource.requirement}}</text><text wx:if="{{learnSource.duration}}">目标时长：{{learnSource.duration}}</text></view>
     <input class="title-input" value="{{project.title}}" bindinput="onTitleChange" placeholder="输入演讲标题" />
     <view class="duration-info">
       预估时长: <text class="duration-text">{{totalDurationStr}}</text>

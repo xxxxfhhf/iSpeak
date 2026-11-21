@@ -29,6 +29,7 @@ const Storage = {
 
   // 保存项目详细数据（卡片列表及导师建议）
   saveProjectData(id, data) {
+    data = { ...(this.getProject(id) || {}), ...data };
     const cards = data.cards || [];
     const totalDurationSec = cards.reduce((sum, c) => sum + (c.durationSec || 0), 0);
     // 计算总字数

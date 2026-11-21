@@ -34,7 +34,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "AI 演讲积木",
+    "navigationBarTitleText": "iSpeaker",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -45,19 +45,19 @@
     "list": [
       {
         "pagePath": "pages/history/history",
-        "text": "会员",
+        "text": "首页",
         "iconPath": "assets/tab/member.png",
         "selectedIconPath": "assets/tab/member-active.png"
       },
       {
         "pagePath": "pages/role/home/home",
-        "text": "角色",
+        "text": "例会",
         "iconPath": "assets/tab/role.png",
         "selectedIconPath": "assets/tab/role-active.png"
       },
       {
         "pagePath": "pages/ops/home/home",
-        "text": "运营",
+        "text": "我的",
         "iconPath": "assets/tab/ops.png",
         "selectedIconPath": "assets/tab/ops-active.png"
       }

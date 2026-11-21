@@ -1,51 +1,12 @@
 <view class="page">
-  <view class="preset-bar">
-    <text
-      class="dur {{totalSec === item * 60 ? 'active' : ''}}"
-      wx:for="{{presets}}"
-      wx:key="*this"
-      bindtap="onSetDuration"
-      data-min="{{item}}"
-    >{{item}}分</text>
-    <text class="dur custom-toggle {{showCustom ? 'active' : ''}}" bindtap="onToggleCustom">自定义</text>
-  </view>
-
+  <view class="preset-bar"><text class="dur {{totalSec === item * 60 ? 'active' : ''}}" wx:for="{{presets}}" wx:key="*this" bindtap="onSetDuration" data-min="{{item}}">{{item}} min</text><text class="dur custom-toggle" bindtap="onToggleCustom">设置</text></view>
   <view class="custom-panel" wx:if="{{showCustom}}">
-    <view class="row">
-      <text class="label">总时长</text>
-      <input class="num" type="number" value="{{totalMin}}" bindinput="onInputMin" />
-      <text class="unit">分</text>
-      <input class="num" type="number" value="{{totalSecPart}}" bindinput="onInputSecPart" />
-      <text class="unit">秒</text>
-    </view>
-    <view class="row">
-      <text class="label">绿牌 ≤</text>
-      <input class="num" type="number" value="{{greenSec}}" bindinput="onInputGreen" />
-      <text class="unit">秒（剩余）</text>
-    </view>
-    <view class="row">
-      <text class="label">黄牌 ≤</text>
-      <input class="num" type="number" value="{{yellowSec}}" bindinput="onInputYellow" />
-      <text class="unit">秒（剩余）</text>
-    </view>
-    <view class="row tip-row">
-      <text class="tip">红牌 = 时间到（0 秒）。需满足：绿牌 ≥ 黄牌 ≥ 0</text>
-    </view>
-    <button class="save-btn" bindtap="onSaveRules">保存为我的规则</button>
+    <view class="row"><text class="label">总时长</text><input class="num" type="number" value="{{totalMin}}" bindinput="onInputMin"/><text class="unit">min</text><input class="num" type="number" value="{{totalSecPart}}" bindinput="onInputSecPart"/><text class="unit">sec</text></view>
+    <view class="row"><text class="label">黄牌剩余</text><input class="num" type="digit" value="{{yellowSec / 60}}" bindinput="onInputYellowMin"/><text class="unit">min</text></view>
+    <text class="tip">开始即绿牌 → 到达黄牌剩余时间 → 时间到红牌</text>
+    <button class="save-btn" bindtap="onSaveRules">保存规则</button>
   </view>
-
-  <view class="card-display card-{{card}}">
-    <text class="time">{{timeStr}}</text>
-    <text class="card-label">{{card === 'green' ? '绿牌' : card === 'yellow' ? '黄牌' : card === 'red' ? '红牌' : '准备'}}</text>
-  </view>
-
-  <view class="rule-summary">
-    <text>总 {{totalSec}}s · 绿≤{{greenSec}}s · 黄≤{{yellowSec}}s · 红=0</text>
-  </view>
-
-  <view class="btns">
-    <button bindtap="onStart">开始</button>
-    <button bindtap="onPause">暂停</button>
-    <button bindtap="onReset">重置</button>
-  </view>
+  <view class="card-display card-{{card}}"><text class="time">{{timeStr}}</text><text class="time-unit">min : sec</text><text class="card-label">{{card === 'green' ? '绿牌 · 从容表达' : card === 'yellow' ? '黄牌 · 准备收尾' : '红牌 · 时间到'}}</text></view>
+  <view class="rule-summary"><text>总时长 {{totalMinLabel}} min · 剩余 {{yellowMinLabel}} min 黄牌 · 0 min 红牌</text></view>
+  <view class="btns"><button bindtap="onStart" disabled="{{running || remainSec === 0}}">{{running ? '计时中' : '开始'}}</button><button bindtap="onPause" disabled="{{!running}}">暂停</button><button bindtap="onReset">重置</button></view>
 </view>

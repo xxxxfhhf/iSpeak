@@ -50,7 +50,7 @@ Page({
       };
     }).sort((a, b) => b.updatedAt - a.updatedAt);
 
-    this.setData({ projects }, () => {
+    this.setData({ projects, recentProject: projects[0] || null }, () => {
       this.filterProjects();
     });
   },
@@ -69,6 +69,12 @@ Page({
     
     const date = new Date(timestamp);
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  },
+
+  onContinueDraft() {
+    const p = this.data.recentProject;
+    if (p) wx.navigateTo({ url: `/pages/index/index?id=${p.id}` });
+    else this.onNewProject();
   },
 
   onSearch(e) {

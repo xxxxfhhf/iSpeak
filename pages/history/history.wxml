@@ -1,17 +1,11 @@
-<view class="container"> 
-  <view class="header"> 
-    <view class="search-box"> 
-      <icon type="search" size="14" /> 
-      <input class="search-input" placeholder="搜索标题或关键词..." bindinput="onSearch" value="{{searchText}}" /> 
-    </view>
-    <view class="nav-btn library-btn" bindtap="onGoToLibrary" title="我的素材库">
-      📚
-    </view>
-    <view class="nav-btn learn-btn" bindtap="onGoToLearning" title="路径学习">
-      🎯
+<view class="container">
+  <view class="header">
+    <view class="search-box">
+      <icon type="search" size="14" />
+      <input class="search-input" placeholder="搜索标题或关键词..." bindinput="onSearch" value="{{searchText}}" />
     </view>
     <view class="nav-btn new-btn-wrapper" catchtap="toggleNewMenu">
-      <view class="new-btn">➕ 新建</view>
+      <view class="new-btn">＋ 新建</view>
       <!-- 气泡菜单 -->
       <view class="popover-menu {{showNewMenu ? 'show' : ''}}" catchtap="preventBubble">
         <view class="menu-item ai-item" catchtap="onNewAiWizard">
@@ -39,62 +33,49 @@
         </view>
       </view>
     </view>
-  </view> 
- 
+  </view>
+
   <!-- 遮罩层，用于点击外部关闭菜单 -->
   <view class="mask" wx:if="{{showNewMenu}}" bindtap="closeNewMenu"></view>
 
-  <!-- 路径学习 / 导师认证 / 公众号入口 -->
-  <view class="learn-entry-bar">
-    <view class="learn-entry-card" bindtap="onGoToLearning">
-      <text class="entry-icon">🎯</text>
-      <view class="entry-info">
-        <text class="entry-title">路径学习</text>
-        <text class="entry-desc">课程 + 路径双轨演练</text>
-      </view>
-      <text class="entry-arrow">›</text>
+  <scroll-view scroll-y class="home-scroll">
+  <view class="dashboard">
+    <view class="dashboard-heading">每一次表达，向前一步</view>
+    <view class="continue-card" hover-class="card-pressed" bindtap="onContinueDraft">
+      <text class="dashboard-label">{{recentProject ? '继续准备' : '准备你的第一次演讲'}}</text>
+      <text class="dashboard-title">{{recentProject ? recentProject.title : '从一个想表达的观点开始'}}</text>
+      <text class="dashboard-caption">{{recentProject ? '预估 ' + recentProject.durationStr + ' · 点击继续备稿' : '选择结构，把想法组织成清晰的演讲'}}</text>
+      <text class="dashboard-action">{{recentProject ? '继续备稿 →' : '开始备稿 →'}}</text>
     </view>
-    <view class="learn-entry-card cert" bindtap="onGoToMentorCert">
-      <text class="entry-icon">🎓</text>
-      <view class="entry-info">
-        <text class="entry-title">导师认证</text>
-        <text class="entry-desc">认证进度与工作坊</text>
-      </view>
-      <text class="entry-arrow">›</text>
+    <view class="quick-actions"><view class="quick-action" hover-class="card-pressed" bindtap="onGoToLearning"><text class="quick-title">成长路径</text><text class="quick-desc">学方法 · 练表达</text></view><view class="quick-action" bindtap="onGoToLibrary"><text class="quick-title">灵感素材</text><text class="quick-desc">存故事 · 找思路</text></view></view>
+    <view class="growth-card" bindtap="onGoToLearning">
+      <view><text class="dashboard-title">下一步成长任务</text><text class="dashboard-caption">查看学习进度，选择演练项目后开始备稿</text></view>
+      <text class="dashboard-action">去学习 ›</text>
     </view>
+    <view class="section-heading">我的稿件</view>
   </view>
-
-  <view class="oa-banner" bindtap="onFollowOfficialAccount">
-    <text class="oa-banner-icon">📢</text>
-    <view class="oa-banner-info">
-      <text class="oa-banner-title">关注公众号「i演讲」</text>
-      <text class="oa-banner-sub">活动通知 · 成长资讯 · 俱乐部动态</text>
-    </view>
-    <text class="oa-banner-arrow">›</text>
-  </view>
-
-  <scroll-view scroll-y class="project-list"> 
-    <block wx:for="{{filteredProjects}}" wx:key="id"> 
-      <view  
-        class="project-card {{selectedIds[item.id] ? 'selected' : ''}}"  
-        bindtap="onProjectTap"  
-        bindlongpress="onProjectLongPress"  
-        data-id="{{item.id}}" 
-      > 
-        <view class="project-info"> 
+  <view class="project-list">
+    <block wx:for="{{filteredProjects}}" wx:key="id">
+      <view
+        class="project-card {{selectedIds[item.id] ? 'selected' : ''}}"
+        bindtap="onProjectTap"
+        bindlongpress="onProjectLongPress"
+        data-id="{{item.id}}"
+      >
+        <view class="project-info">
           <view class="project-title-row">
             <view class="title-wrapper">
               <text class="project-title">{{item.title}}</text>
               <view class="ai-indicator" wx:if="{{item.hasUnconfirmedAi}}">✨ AI</view>
             </view>
-            
+
             <!-- 更多操作按钮 -->
             <view class="more-btn" catchtap="onShowActionSheet" data-id="{{item.id}}" data-title="{{item.title}}">
               <text class="more-dot">···</text>
             </view>
-          </view> 
-           
-          <view class="project-meta-row"> 
+          </view>
+
+          <view class="project-meta-row">
             <text class="type-tag {{item.type}}">{{item.typeLabel}}</text>
             <text class="meta-divider">·</text>
             <text class="meta-text">{{item.durationStr}}</text>
@@ -102,36 +83,37 @@
             <text class="meta-text">{{item.totalWordCount || 0}} 字</text>
             <text class="meta-divider">·</text>
             <text class="meta-text">{{item.timeAgo}}</text>
-          </view> 
+          </view>
 
-          <!-- 结构进度条 --> 
-          <view class="progress-bar-container"> 
-            <view class="progress-bar" style="width: {{item.progress * 100}}%"></view> 
-          </view> 
-        </view> 
+          <!-- 结构进度条 -->
+          <view class="progress-bar-container">
+            <view class="progress-bar" style="width: {{item.progress * 100}}%"></view>
+          </view>
+        </view>
 
-        <view class="select-icon" wx:if="{{isSelectMode}}"> 
-          <icon type="{{selectedIds[item.id] ? 'success' : 'circle'}}" size="22" color="{{selectedIds[item.id] ? '#007aff' : '#ccc'}}" /> 
-        </view> 
-      </view> 
-    </block> 
- 
-    <view class="empty-state" wx:if="{{filteredProjects.length === 0}}"> 
-      <view class="empty-icon">📂</view> 
-      <text>{{searchText ? '未找到相关稿件' : '还没有心血之作，开始创作吧'}}</text> 
-    </view> 
- 
-    <view class="list-footer" wx:if="{{filteredProjects.length > 0}}"> 
-      --- 到底啦，只有这 {{filteredProjects.length}} 篇心血之作 --- 
-    </view> 
-  </scroll-view> 
- 
-  <!-- 批量操作栏 --> 
-  <view class="batch-bar" wx:if="{{isSelectMode}}"> 
-    <view class="batch-info">已选择 {{selectedCount}} 项</view> 
-    <view class="batch-btns"> 
-      <view class="batch-btn cancel" bindtap="onCancelSelect">取消</view> 
-      <view class="batch-btn delete" bindtap="onBatchDelete">删除 ({{selectedCount}})</view> 
-    </view> 
-  </view> 
-</view> 
+        <view class="select-icon" wx:if="{{isSelectMode}}">
+          <icon type="{{selectedIds[item.id] ? 'success' : 'circle'}}" size="22" color="{{selectedIds[item.id] ? '#007aff' : '#ccc'}}" />
+        </view>
+      </view>
+    </block>
+
+    <view class="empty-state" wx:if="{{filteredProjects.length === 0}}">
+      <view class="empty-icon">📂</view>
+      <text>{{searchText ? '未找到相关稿件' : '还没有稿件，点击上方开始备稿'}}</text>
+    </view>
+
+    <view class="list-footer" wx:if="{{filteredProjects.length > 0}}">
+      共 {{filteredProjects.length}} 篇稿件
+    </view>
+  </view>
+  </scroll-view>
+
+  <!-- 批量操作栏 -->
+  <view class="batch-bar" wx:if="{{isSelectMode}}">
+    <view class="batch-info">已选择 {{selectedCount}} 项</view>
+    <view class="batch-btns">
+      <view class="batch-btn cancel" bindtap="onCancelSelect">取消</view>
+      <view class="batch-btn delete" bindtap="onBatchDelete">删除 ({{selectedCount}})</view>
+    </view>
+  </view>
+</view>
