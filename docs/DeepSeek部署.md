@@ -1,7 +1,7 @@
 # DeepSeek 服务部署
 
 ## 必须完成
-1. 在微信开发者工具上传并部署 cloudfunctions/speechAI，选择云端安装依赖；Node.js 18 或更新运行时，函数超时90秒。
+1. 在微信开发者工具上传并部署 cloudfunctions/Deepseek，选择云端安装依赖；Node.js 18 或更新运行时，函数超时90秒。
 2. 在云函数服务端环境变量配置 DEEPSEEK_API_KEY；可选 DEEPSEEK_MODEL，默认 deepseek-flash。密钥只在云端配置，不写入小程序、Git 或聊天。
 3. 创建集合 ai_usage、club_members、club_knowledge。三者客户端读写权限全部关闭，只允许云函数服务端访问。
 4. 在云控制台添加成员记录：openid（成员微信身份）、clubId（俱乐部标识）、active: true、role: member 或 admin。每个 openid 当前仅支持一个有效俱乐部。
