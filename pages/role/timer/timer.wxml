@@ -8,7 +8,7 @@
   <text class="tip">0.5 min = 30秒。时间到固定红牌，继续计时直到超时响铃。</text>
   <button class="save-btn" bindtap="onSaveRules">保存自定义规则</button><button class="save-btn" bindtap="onStandard">按总时长恢复标准规则</button>
  </view>
- <view class="card-display card-{{card}}"><text class="card-label">{{remainSec &lt; 0 ? '已超时' : '剩余时间'}}</text><text class="time">{{timeStr}}</text><text class="time-unit">min : sec</text><text class="card-label">{{finished ? '必须结束演讲' : card === 'green' ? '绿牌' : card === 'yellow' ? '黄牌 · 准备收尾' : card === 'red' ? '红牌 · 时间到' : '计时中 · 尚未亮牌'}}</text></view>
+ <view class="card-display card-{{card}}"><text class="card-label">{{0 > remainSec ? '已超时' : '剩余时间'}}</text><text class="time">{{timeStr}}</text><text class="time-unit">min : sec</text><text class="card-label">{{finished ? '必须结束演讲' : card === 'green' ? '绿牌' : card === 'yellow' ? '黄牌 · 准备收尾' : card === 'red' ? '红牌 · 时间到' : '计时中 · 尚未亮牌'}}</text></view>
  <view class="rule-summary"><text>{{mode === 'custom' ? '自定义规则' : '标准规则'}} · 总 {{totalSec / 60}} min</text><text class="summary-line">剩余 {{greenSec / 60}} min 绿牌 · {{yellowSec / 60}} min 黄牌</text><text class="summary-line">0 min 红牌 · 超时 {{bellSec / 60}} min 响铃，必须结束</text></view>
  <view class="btns"><button bindtap="onStart" disabled="{{running || finished}}">{{running ? '计时中' : '开始 / 继续'}}</button><button bindtap="onPause" disabled="{{!running}}">暂停</button><button bindtap="onReset">重置</button></view>
 </view>
