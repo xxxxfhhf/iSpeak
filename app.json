@@ -72,5 +72,6 @@
     "scope.record": {
       "desc": "用于将口述想法识别成文字，辅助演讲备稿"
     }
-  }
+  },
+  "entryPagePath": "pages/history/history"
 }

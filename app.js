@@ -1,4 +1,7 @@
 App({
+  onPageNotFound() {
+    wx.switchTab({ url: '/pages/history/history' });
+  },
   onLaunch() {
     // 初始化云开发
     if (!wx.cloud) {
