@@ -3,10 +3,12 @@ const Storage=require('../../utils/storage');
 const KEY='speech_coach_session';
 const TYPES=[{id:'auto',name:'自动识别'},{id:'general',name:'通用表达'},{id:'story',name:'故事演讲'},{id:'report',name:'工作汇报'},{id:'persuasive',name:'观点说服'},{id:'impromptu',name:'即兴表达'}];
 Page({
- data:{mode:'level',speechType:'auto',modeLabel:'按我的等级',typeLabel:'自动识别',detectedLabel:'',messages:[],input:'',busy:false,recording:false,starting:false,ready:false,showDetails:false,phase:'idle',greeting:'你好，我是你的演讲教练。今天，有什么想说的？',sources:[],projectId:'',scrollTo:''},
+ data:{mode:'level',speechType:'auto',modeLabel:'按我的等级',typeLabel:'自动识别',detectedLabel:'',messages:[],input:'',busy:false,recording:false,starting:false,ready:false,speaking:false,audioStatus:'',showDetails:false,phase:'idle',greeting:'你好，我是你的演讲教练。今天，有什么想说的？',sources:[],projectId:'',scrollTo:''},
  onLoad(){
   const saved=wx.getStorageSync(KEY)||{};this.setData({messages:saved.messages||[],projectId:saved.projectId||'',greeting:(saved.messages||[]).length?'欢迎回来，我们继续聊你的故事。':'你好，我是你的演讲教练。今天，有什么想说的？'});
   const prefs=wx.getStorageSync('coach_preferences')||{};this.setData({mode:prefs.mode==='general'?'general':'level',speechType:TYPES.some(t=>t.id===prefs.speechType)?prefs.speechType:'auto'});this.refreshSettings();
+  this.player=wx.createInnerAudioContext();this.player.obeyMuteSwitch=false;
+  this.player.onEnded(()=>this.stopSpeech());this.player.onError(()=>{this.stopSpeech();this.setData({audioStatus:'声音播放失败，请检查媒体音量'});});
   this.recorder=wx.getRecorderManager();
   this.recorder.onStart(()=>{if(this.closed){this.recorder.stop();return;}this.setData({recording:true,starting:false,phase:'listening'});});
   this.recorder.onError(()=>{if(!this.closed){this.setData({recording:false,starting:false,phase: "idle"});wx.showToast({title:'无法录音，请检查麦克风权限',icon:'none'});}});
@@ -19,13 +21,20 @@ Page({
    }catch(e){this.error(e);}finally{if(!this.closed)this.setData({busy:false,phase:'idle'});}
   });
  },
- onUnload(){this.closed=true;if(this.recorder&&(this.data.recording||this.data.starting))this.recorder.stop();},
- onHide(){if(this.recorder&&this.data.recording)this.recorder.stop();},
+ onUnload(){this.closed=true;this.stopSpeech();if(this.player)this.player.destroy();if(this.recorder&&(this.data.recording||this.data.starting))this.recorder.stop();},
+ onHide(){this.stopSpeech();if(this.recorder&&this.data.recording)this.recorder.stop();},
  error(e){if(!this.closed)wx.showModal({title:'暂未完成',content:e.message||'请求失败，请重试',showCancel:false});},
  persist(){wx.setStorageSync(KEY,{messages:this.data.messages,projectId:this.data.projectId});},
  onInput(e){this.setData({input:e.detail.value});},
+ stopSpeech(){this.speechVersion=(this.speechVersion||0)+1;if(this.player)this.player.stop();if(this.audioPath){try{wx.getFileSystemManager().unlinkSync(this.audioPath);}catch(e){}this.audioPath=null;}if(!this.closed)this.setData({speaking:false});},
+ async speak(text){
+  this.stopSpeech();const version=this.speechVersion;this.setData({audioStatus:'正在准备声音…'});
+  try{const res=await call({action:'speak',text:text.slice(0,500)});if(this.closed||version!==this.speechVersion)return;
+   this.audioPath=wx.env.USER_DATA_PATH+'/coach-reply.wav';wx.getFileSystemManager().writeFileSync(this.audioPath,res.audio,'base64');this.player.src=this.audioPath;this.setData({speaking:true,audioStatus:''});this.player.play();
+  }catch(e){if(!this.closed&&version===this.speechVersion)this.setData({audioStatus:'语音播报暂不可用：'+e.message});}
+ },
  onRecord(){
-  if(this.data.busy||this.data.starting)return;
+  if(this.data.busy||this.data.starting)return;this.stopSpeech();
   if(this.data.recording){this.recorder.stop();return;}
   const begin=()=>{if(this.closed)return;const start=()=>{if(this.closed)return;this.setData({starting:true});this.recorder.start({duration:60000,sampleRate:16000,numberOfChannels:1,format:'PCM'});};if(wx.requirePrivacyAuthorize)wx.requirePrivacyAuthorize({success:start,fail:()=>wx.showToast({title:'请先同意隐私授权',icon:'none'})});else start();};
   if(wx.getStorageSync('voice_coach_consent_v1'))begin();else wx.showModal({title:'开启语音对话',content:'录音将发送至 DeepSeek 识别，结束后自动发送给教练。每段最多60秒，识别文字可在对话记录中查看。',success:r=>{if(r.confirm){wx.setStorageSync('voice_coach_consent_v1',true);begin();}}});
@@ -46,7 +55,7 @@ Page({
   const messages=[...this.data.messages,{role:'user',content:this.data.input.trim()}];
   this.setData({busy:true,input:'',phase:'thinking'});
   try{const result=await call({action:'coach',messages,coaching:this.context()});if(this.closed)return;
-   this.setData({messages:[...messages,{role:'assistant',content:result.text}],detectedLabel:(TYPES.find(t=>t.id===result.detectedType)||{}).name||'',sources:result.sources||[],scrollTo:'msg-'+messages.length});this.persist();
+   this.setData({messages:[...messages,{role:'assistant',content:result.text}],detectedLabel:(TYPES.find(t=>t.id===result.detectedType)||{}).name||'',sources:result.sources||[],scrollTo:'msg-'+messages.length});this.persist();this.speak(result.text);
   }catch(e){if(!this.closed)this.setData({input:messages[messages.length-1].content});this.error(e);}finally{if(!this.closed)this.setData({busy:false,phase:'idle'});}
  },
  async draft(){
