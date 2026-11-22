@@ -4,3 +4,5 @@
 .listening .core{background:radial-gradient(circle at 30% 25%,#fff4b8,#ff9c54 40%,#e13a56);box-shadow:0 0 90rpx #e9545466}.listening .halo{border-color:#ffbd84;animation-duration:1s}.speaking .core{background:radial-gradient(circle at 30% 25%,#f4edff,#a78cff 40%,#5935b4)}.speaking .wave view{animation:wave .55s infinite alternate}.audio-status{text-align:center;color:#f1c998;font-size:24rpx;margin-top:16rpx}.state{font-weight:600}
 
 .last-spoken{font-size:24rpx;color:#a2b8cc;max-height:70rpx;overflow:hidden;margin-top:8rpx;line-height:1.5}
+
+.recovery-message{color:#b3f3d5;font-size:26rpx;line-height:1.6;text-align:center;margin-top:16rpx}

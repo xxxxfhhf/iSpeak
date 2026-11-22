@@ -32,9 +32,10 @@ exports.main=async event=>{
  let job;
  try{
   const uid=cloud.getWXContext().OPENID;if(!uid)throw new Error('请通过小程序登录后使用');
+  if(event.action==='prepareRecording')return {ok:true,prefix:'voice-input/'+uid+'/'};
   if(event.action==='peek'){
    if(!/^[a-zA-Z0-9_-]{10,80}$/.test(event.requestId||''))throw new Error('请求标识无效');
-   try{const row=(await db.collection('ai_usage').doc('reply_'+uid+'_'+event.requestId).get()).data;return {ok:true,text:row.text||'',done:row.done,error:row.error||'',sources:row.sources||[]};}catch(e){if(/not exist|not found|不存在/i.test(e.message||e.errMsg||''))return {ok:true,text:'',done:false};throw e;}
+   try{const row=(await db.collection('ai_usage').doc((event.kind==='transcribe'?'asr_':'reply_')+uid+'_'+event.requestId).get()).data;if(!row.done&&Date.now()-row.createdAt>65000)return {ok:true,text:row.text||'',done:true,error:'上轮任务已结束等待，可重试原内容'};return {ok:true,text:row.text||'',done:row.done,error:row.error||'',sources:row.sources||[]};}catch(e){if(/not exist|not found|不存在/i.test(e.message||e.errMsg||''))return {ok:true,text:'',done:false};throw e;}
   }
   if(event.action==='knowledge'){
    const admin=(await db.collection('club_members').where({openid:uid,active:true,role:'admin'}).limit(1).get()).data[0];if(!admin)throw new Error('仅俱乐部管理员可录入知识库');
@@ -49,12 +50,25 @@ exports.main=async event=>{
    const file=await cloud.uploadFile({cloudPath:'ai-voice/'+uid+'/'+Date.now()+'.wav',fileContent:audio});return {ok:true,audioFileID:file.fileID};
   }
   if(event.action==='transcribe'){
-   if(typeof event.audio!=='string'||event.audio.length>2700000||!/^[A-Za-z0-9+/=]+$/.test(event.audio))throw new Error('录音无效或过大，请分段录制');
-   const pcm=Buffer.from(event.audio,'base64');if(!pcm.length||pcm.length>1920000||pcm.length%2)throw new Error('录音格式异常');
+   if(event.requestId){
+    if(!/^[a-zA-Z0-9_-]{10,80}$/.test(event.requestId))throw new Error('录音标识无效');
+    job=db.collection('ai_usage').doc('asr_'+uid+'_'+event.requestId);
+    try{await db.collection('ai_usage').add({data:{_id:'asr_'+uid+'_'+event.requestId,text:'',done:false,createdAt:Date.now()}});}
+    catch(e){if(!/duplicate|already exist|已存在/i.test(e.message||e.errMsg||''))throw e;const row=(await job.get()).data;job=null;if(row.error)return {ok:false,error:row.error,terminal:true};return {ok:true,text:row.text,done:row.done};}
+   }
+   let pcm;
+   if(event.audioFileID){
+    if(typeof event.audioFileID!=='string'||!event.audioFileID.startsWith('cloud://')||!event.audioFileID.includes('/voice-input/'+uid+'/'))throw new Error('无权识别该录音');
+    pcm=(await cloud.downloadFile({fileID:event.audioFileID})).fileContent;
+   }else{
+    if(typeof event.audio!=='string'||event.audio.length>2700000||!/^[A-Za-z0-9+/=]+$/.test(event.audio))throw new Error('录音无效或过大');
+    pcm=Buffer.from(event.audio,'base64');
+   }
+   if(!pcm.length||pcm.length>1920000||pcm.length%2)throw new Error('录音格式异常');
    await quota(uid);
    const wav=Buffer.alloc(44+pcm.length);wav.write('RIFF');wav.writeUInt32LE(36+pcm.length,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(16000,24);wav.writeUInt32LE(32000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(pcm.length,40);pcm.copy(wav,44);
    const boundary='speech-'+Date.now();const body=Buffer.concat([Buffer.from('--'+boundary+'\r\nContent-Disposition: form-data; name="file"; filename="voice.wav"\r\nContent-Type: audio/wav\r\n\r\n'),wav,Buffer.from('\r\n--'+boundary+'--\r\n')]);
-   const result=await request('/v1/tools/asr',body,'multipart/form-data; boundary='+boundary);return {ok:true,text:result.text||''};
+   const result=await request('/v1/tools/asr',body,'multipart/form-data; boundary='+boundary);if(!result.text||!result.text.trim())throw new Error('未识别到文字，原录音已保存');if(job)await job.update({data:{text:result.text,done:true}});return {ok:true,text:result.text,done:true};
   }
   if(!['coach','draft','generate'].includes(event.action))throw new Error('不支持的操作');
   const messages=event.messages;if(!Array.isArray(messages)||!messages.length||messages.length>24||messages.some(m=>!['user','assistant'].includes(m.role)||typeof m.content!=='string'||m.content.length>12000)||messages.reduce((n,m)=>n+m.content.length,0)>40000)throw new Error('对话过长，请保存稿件后新建对话');
@@ -79,5 +93,5 @@ exports.main=async event=>{
   }
   const result=await request('/chat/completions',JSON.stringify({model:process.env.DEEPSEEK_MODEL||'deepseek-flash',messages:[{role:'system',content:prompt},...messages],stream:false,max_tokens:event.action === 'coach' ? 768 : 4096,thinking:{type:'disabled'},...(event.action==='draft'?{response_format:{type:'json_object'}}:{})}));
   const text=result.choices&&result.choices[0]&&result.choices[0].message.content;if(!text)throw new Error('AI 未返回正文，请重试');const answer=event.action==='coach'?Coaching.parseCoach(text,coaching):{text};return {ok:true,...answer,sources:refs.map(r=>r.title)};
- }catch(e){if(job){try{await job.update({data:{done:true,error:e.message||'服务暂不可用'}});}catch(ignore){}}return {ok:false,error:e.message||'服务暂不可用'};}
+ }catch(e){if(job){try{await job.update({data:{done:true,error:e.message||'服务暂不可用'}});}catch(ignore){}}return {ok:false,error:e.message||'服务暂不可用',terminal:!!job};}
 };
