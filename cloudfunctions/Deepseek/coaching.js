@@ -21,8 +21,15 @@ function guidance(value){
  '\n【材料依据】路径原文或案例只在检索到时引用，不捏造课程内容；用户原话与会员案例必须区分。';
 }
 function parseCoach(raw,context){
- const c=normalize(context);let data;try{data=JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,''));}catch(e){throw new Error('教练回复格式异常，请重试，原输入已保留');}
- if(!data||typeof data.reply!=='string'||!data.reply.trim())throw new Error('教练未返回有效回复，请重试');
- return {text:data.reply,detectedType:c.speechType==='auto'?(TYPES[data.detectedType]&&data.detectedType!=='auto'?data.detectedType:'general'):c.speechType};
+ const c=normalize(context);
+ if(typeof raw!=='string'||!raw.trim())throw new Error('教练未返回正文，请重试');
+ let text=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+ // Accept legacy structured responses, but ordinary dialogue is plain text.
+ if(text.charAt(0)==='{'){
+  let data;try{data=JSON.parse(text);}catch(e){throw new Error('回复被截断，请重试；你的输入已保留');}
+  text=data.reply||data.text||data.content;
+  if(typeof text!=='string'||!text.trim())throw new Error('教练未返回正文，请重试');
+ }
+ return {text, ...(c.speechType==='auto'?{}:{detectedType:c.speechType})};
 }
 module.exports={normalize,guidance,parseCoach};
