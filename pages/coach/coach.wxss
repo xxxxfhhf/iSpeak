@@ -6,3 +6,5 @@
 .last-spoken{font-size:24rpx;color:#a2b8cc;max-height:70rpx;overflow:hidden;margin-top:8rpx;line-height:1.5}
 
 .recovery-message{color:#b3f3d5;font-size:26rpx;line-height:1.6;text-align:center;margin-top:16rpx}
+
+.material-progress{margin-top:20rpx;padding:20rpx;background:#112337;border-radius:20rpx;max-height:30vh;overflow-y:auto}.progress-head{display:flex;justify-content:space-between;font-size:25rpx;color:#c8e7eb;margin-bottom:12rpx}.progress-hint{display:block;color:#94acbf;font-size:23rpx;line-height:1.5;margin-top:8rpx}.draft-now{min-height:44px;line-height:44px;margin-top:14rpx;background:#254c59;color:#dcfff4;font-size:26rpx}.material-item{padding:14rpx 0;border-bottom:1rpx solid #244052;font-size:25rpx}.dialogue{height:21vh;min-height:110rpx;margin-top:18rpx}.orb{max-height:22vh;max-width:22vh}
