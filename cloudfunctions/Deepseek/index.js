@@ -1,3 +1,4 @@
+const makeWav=require('./wav');
 const stream=require('./stream');
 const Coaching=require('./coaching');
 const cloud=require('wx-server-sdk');
@@ -46,7 +47,7 @@ exports.main=async event=>{
   if(event.action==='speak'){
    if(typeof event.text!=='string'||!event.text.trim()||event.text.length>500)throw new Error('播报文字无效');
    await quota(uid);
-   const audio=await request('/v1/tools/tts',JSON.stringify({text:event.text,voice_id:'stella',format:'wav'}),'application/json',true);
+   const pcm=await request('/v1/tools/tts',JSON.stringify({text:event.text,voice_id:'stella',format:'pcm'}),'application/json',true);const audio=makeWav(pcm,24000);
    const file=await cloud.uploadFile({cloudPath:'ai-voice/'+uid+'/'+Date.now()+'.wav',fileContent:audio});return {ok:true,audioFileID:file.fileID};
   }
   if(event.action==='transcribe'){

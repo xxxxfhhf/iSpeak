@@ -1,3 +1,4 @@
+const normalizeWav=require('../../utils/wavAudio');
 const Vault=require('../../utils/recordingVault');
 const call=require('../../utils/speechAI');
 const Storage=require('../../utils/storage');
@@ -45,7 +46,7 @@ Page({
  async speak(text){
   this.stopSpeech();const version=this.speechVersion;this.setData({audioStatus:'正在准备声音…'});
   try{const res=await call({action:'speak',text:text.slice(0,200)});if(this.closed||version!==this.speechVersion)return;
-   const downloaded=await wx.cloud.downloadFile({fileID:res.audioFileID});if(this.closed||version!==this.speechVersion)return;this.audioPath=downloaded.tempFilePath;const player=wx.createInnerAudioContext();this.player=player;player.obeyMuteSwitch=false;
+   const downloaded=await wx.cloud.downloadFile({fileID:res.audioFileID});if(this.closed||version!==this.speechVersion)return;const audio=normalizeWav(wx.getFileSystemManager().readFileSync(downloaded.tempFilePath));this.audioPath=wx.env.USER_DATA_PATH+'/coach-play-'+version+'.wav';wx.getFileSystemManager().writeFileSync(this.audioPath,audio);const player=wx.createInnerAudioContext();this.player=player;player.obeyMuteSwitch=false;
    player.onPlay(()=>{if(!this.closed&&version===this.speechVersion)this.setData({speaking:true,audioStatus:''});});
    player.onEnded(()=>{if(!this.closed&&version===this.speechVersion)this.stopSpeech();});
    player.onError(e=>{if(!this.closed&&version===this.speechVersion){this.stopSpeech();this.setData({audioStatus:'音频解码或播放失败（'+(e.errCode||'未知')+'）：'+(e.errMsg||'可从菜单重播')});}});
