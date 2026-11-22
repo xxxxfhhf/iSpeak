@@ -3,7 +3,7 @@ const Storage=require('../../utils/storage');
 const KEY='speech_coach_session';
 const TYPES=[{id:'auto',name:'自动识别'},{id:'general',name:'通用表达'},{id:'story',name:'故事演讲'},{id:'report',name:'工作汇报'},{id:'persuasive',name:'观点说服'},{id:'impromptu',name:'即兴表达'}];
 Page({
- data:{mode:'level',speechType:'auto',modeLabel:'按我的等级',typeLabel:'自动识别',detectedLabel:'',messages:[],input:'',busy:false,recording:false,starting:false,ready:false,speaking:false,audioStatus:'',showDetails:false,phase:'idle',greeting:'你好，我是你的演讲教练。今天，有什么想说的？',sources:[],projectId:'',scrollTo:''},
+ data:{mode:'level',speechType:'auto',modeLabel:'按我的等级',typeLabel:'自动识别',detectedLabel:'',partialReply:'',lastSpoken:'',messages:[],input:'',busy:false,recording:false,starting:false,ready:false,speaking:false,audioStatus:'',showDetails:false,phase:'idle',greeting:'你好，我是你的演讲教练。今天，有什么想说的？',sources:[],projectId:'',scrollTo:''},
  onLoad(){
   const saved=wx.getStorageSync(KEY)||{};this.setData({messages:saved.messages||[],projectId:saved.projectId||'',greeting:(saved.messages||[]).length?'欢迎回来，我们继续聊你的故事。':'你好，我是你的演讲教练。今天，有什么想说的？'});
   const prefs=wx.getStorageSync('coach_preferences')||{};this.setData({mode:prefs.mode==='general'?'general':'level',speechType:TYPES.some(t=>t.id===prefs.speechType)?prefs.speechType:'auto'});this.refreshSettings();
@@ -29,8 +29,8 @@ Page({
  stopSpeech(){this.speechVersion=(this.speechVersion||0)+1;if(this.player)this.player.stop();if(this.audioPath){try{wx.getFileSystemManager().unlinkSync(this.audioPath);}catch(e){}this.audioPath=null;}if(!this.closed)this.setData({speaking:false});},
  async speak(text){
   this.stopSpeech();const version=this.speechVersion;this.setData({audioStatus:'正在准备声音…'});
-  try{const res=await call({action:'speak',text:text.slice(0,500)});if(this.closed||version!==this.speechVersion)return;
-   this.audioPath=wx.env.USER_DATA_PATH+'/coach-reply.wav';wx.getFileSystemManager().writeFileSync(this.audioPath,res.audio,'base64');this.player.src=this.audioPath;this.setData({speaking:true,audioStatus:''});this.player.play();
+  try{const res=await call({action:'speak',text:text.slice(0,200)});if(this.closed||version!==this.speechVersion)return;
+   const downloaded=await wx.cloud.downloadFile({fileID:res.audioFileID});if(this.closed||version!==this.speechVersion)return;this.audioPath=downloaded.tempFilePath;this.player.src=this.audioPath;this.setData({speaking:true,audioStatus:''});this.player.play();
   }catch(e){if(!this.closed&&version===this.speechVersion)this.setData({audioStatus:'语音播报暂不可用：'+e.message});}
  },
  onRecord(){
@@ -51,18 +51,18 @@ Page({
  more(){if(this.data.busy||this.data.recording||this.data.starting)return;wx.showActionSheet({itemList:['查看对话 / 文字补充','整理成稿','开始新对话'],success:r=>{if(r.tapIndex===0)this.toggleDetails();if(r.tapIndex===1)this.draft();if(r.tapIndex===2)this.fresh();}});},
  async send(){
   if(this.data.busy||this.data.recording||this.data.starting||!this.data.input.trim())return;
-  if(this.data.messages.length>=22){wx.showToast({title:'请先整理成稿或开始新对话',icon:'none'});return;}
-  const messages=[...this.data.messages,{role:'user',content:this.data.input.trim()}];
-  this.setData({busy:true,input:'',phase:'thinking'});
-  try{const result=await call({action:'coach',messages,coaching:this.context()});if(this.closed)return;
-   this.setData({messages:[...messages,{role:'assistant',content:result.text}],detectedLabel:(TYPES.find(t=>t.id===result.detectedType)||{}).name||'',sources:result.sources||[],scrollTo:'msg-'+messages.length});this.persist();this.speak(result.text);
+  this.stopSpeech();const messages=[...this.data.messages,{role:'user',content:this.data.input.trim()}];
+  const contextMessages=messages.length>21?[...messages.slice(0,2),...messages.slice(-19)]:messages;
+  this.setData({busy:true,input:'',partialReply:'',lastSpoken:messages[messages.length-1].content,phase:'thinking'});
+  try{const result=await call.progressive({action:'coach',messages:contextMessages,coaching:this.context()},text=>{if(!this.closed)this.setData({partialReply:text});},()=>this.closed);if(this.closed)return;
+   this.setData({partialReply:'',messages:[...messages,{role:'assistant',content:result.text}],detectedLabel:(TYPES.find(t=>t.id===result.detectedType)||{}).name||'',sources:result.sources||[],scrollTo:'msg-'+messages.length});this.persist();this.speak(result.text);
   }catch(e){if(!this.closed)this.setData({input:messages[messages.length-1].content});this.error(e);}finally{if(!this.closed)this.setData({busy:false,phase:'idle'});}
  },
  async draft(){
   if(this.data.busy||this.data.recording||this.data.starting||!this.data.messages.length)return;
   this.setData({busy:true,phase:'drafting'});
   try{
-   const result=await call({action:'draft',messages:this.data.messages,coaching:this.context()});const draft=JSON.parse(result.text);
+   const result=await call({action:'draft',messages:this.data.messages.length>22?[...this.data.messages.slice(0,2),...this.data.messages.slice(-20)]:this.data.messages,coaching:this.context()});const draft=JSON.parse(result.text);
    if(!draft.title||!Array.isArray(draft.cards)||!draft.cards.length||draft.cards.some(c=>typeof c.content!=='string'))throw new Error('稿件格式异常，原对话已保留，请重试');
    if(this.closed)return;
    const existing=this.data.projectId&&Storage.getProject(this.data.projectId);
@@ -73,5 +73,5 @@ Page({
    this.setData({projectId:id});this.persist();wx.navigateTo({url:'/pages/index/index?id='+id});
   }catch(e){this.error(e);}finally{if(!this.closed)this.setData({busy:false,phase:'idle'});}
  },
- fresh(){if(this.data.busy||this.data.recording||this.data.starting)return;wx.showModal({title:'开始新对话',content:'当前对话将清空；已生成的稿件仍保留在首页。',success:r=>{if(r.confirm){this.setData({greeting:'你好，这次有什么想表达的？',detectedLabel:'',messages:[],input:'',projectId:'',sources:[]});this.persist();}}});}
+ fresh(){if(this.data.busy||this.data.recording||this.data.starting)return;wx.showModal({title:'开始新对话',content:'当前对话将清空；已生成的稿件仍保留在首页。',success:r=>{if(r.confirm){this.setData({greeting:'你好，这次有什么想表达的？',detectedLabel:'',partialReply:'',lastSpoken:'',messages:[],input:'',projectId:'',sources:[]});this.persist();}}});}
 });
